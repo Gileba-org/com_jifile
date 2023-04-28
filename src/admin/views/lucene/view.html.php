@@ -10,23 +10,23 @@ defined('_JEXEC') or die();
 jimport( 'joomla.application.component.view' );
 
 class JifileViewLucene extends JViewLegacy {
-	
+
 	/**
-	 * Plugin Registry for Lucene  
+	 * Plugin Registry for Lucene
 	 * @var array
 	 */
 	protected $pluginLucene = null;
-	
+
 	public function __construct() {
 		// get PluginLucene
 		$this->pluginLucene = jifilehelper::getPluginLuceneInstance();
-		
+
 		parent::__construct();
 	}
-	
+
 	function display($tpl = null) {
 		$option = JRequest::getCmd('option');
-		
+
 		// add document to templates
 		$this->setDocument();
 		// verify authorise
@@ -35,10 +35,10 @@ class JifileViewLucene extends JViewLegacy {
 			$this->setToolbar($option, false);
 			return JError::raiseWarning(404, JText::_('JERROR_ALERTNOAUTHOR'));
 		}
-		
+
 		$index_path = $this->get('Index_path');
 		$model = $this->getModel();
-		
+
 		$errore = null;
 		$rootApp = '';
 		if(!$index_path) {
@@ -48,34 +48,34 @@ class JifileViewLucene extends JViewLegacy {
 		} elseif ($model->getError()) {
 			$errore = $model->getError();
 		}
-		
+
 		if($errore) {
 			$this->setToolbar($option, false);
 			$this->assign('error_pref', $errore.'. '.JText::_('BACK_CONTROL_PANEL'));
 			parent::display($tpl);
 			return false;
 		}
-		
+
 		$params = JComponentHelper::getParams( 'com_jifile' );
 		$basepath = jifilehelper::getCorrectPath($params->get( 'base_path' ));
 		$realpath = realpath(JPATH_SITE.DS.$basepath);
 		$basepath = str_replace(JPATH_SITE.DS, '', $realpath);
-		
+
 		// recupero dell'oggetto JApplication
 		$app = JFactory::getApplication();
 
 		$this->setToolbar($option);
-		
-		// Recupero dei filtri 
+
+		// Recupero dei filtri
 		// search filter
 		$filterString = $app->getUserStateFromRequest( $option.'search_lucene', 'search', '', 'string' );
-		
+
 		$filterField 		 = $app->getUserStateFromRequest( $option.'filter_field_lucene', 'filter_field', '', 'string' );
 		$filterSearchphrases = $app->getUserStateFromRequest( $option.'filter_searchphrases_lucene', 'filter_searchphrases', '', 'string' );
-		
+
 		$filter_order		= $app->getUserStateFromRequest( $option.'filter_order',	'filter_order',		null,	'cmd' );
 		$filter_order_Dir	= $app->getUserStateFromRequest( $option.'filter_order_Dir','filter_order_Dir',	null,	'word' );
-		
+
 		// pagination start end limit
 		$limitstart = $app->getUserStateFromRequest( $option.'limitstart_lucene', 'limitstart', 0, 'number' );
 		$limit 		= $app->getUserStateFromRequest( $option.'limit_lucene', 'limit', 10, 'number' );
@@ -85,22 +85,22 @@ class JifileViewLucene extends JViewLegacy {
 			JRequest::setVar('limitstart', 0);
 			$limitstart = 0;
 		}
-		
+
 		$index = $model->getIndex();
 		$fieldNames = $index->getFieldNames(true);
-		
+
 		$filter['search'] 		= $filterString;
 		$filter['fields'] 		= $this->getFilterFields($fieldNames, $filterField);
 		$filter['searchphrase'] = $this->getFilterSearchphrases($filterSearchphrases);
 		$filter['order'] 		= $filter_order;
 		$filter['order_Dir'] 	= $filter_order_Dir;
-		
+
 		//report index
 		$count = $index->count(); //Totale file inseriti
 		$numDocs = $index->numDocs(); //Totale file indicizzati
 		$numDelete = $count-$numDocs; //Totale file eliminati
 		$optimize = !$index->hasDeletions(); //Ottimizzazione
-		
+
 		//gestione ricerca + cache
 		if(!empty($filter['search'])) {
 			// se il campo ricerca e' pieno
@@ -127,32 +127,32 @@ class JifileViewLucene extends JViewLegacy {
 		} else {
 			//no ricerca tutti i record
 			$tot = $count;
-			
+
 			$cacheId = md5("ALL_$index_path.$tot.$limitstart.$limit");
-			
+
 			if(!($lucene = jifilehelper::getCache($cacheId))) {
 				if(JDEBUG) {echo 'NO CACHE<br/>';}
 				$lucene = $this->getAllDocuments($index, $tot, $limitstart, $limit);
 				jifilehelper::setCache($cacheId, $lucene, array('lucene'));
 			}
 		}
-		
+
 		$fieldView = array('name', 'key');
 		if(!empty($filterField)) {
 			array_push($fieldView, $filterField);
 		}
-				
+
 		jimport('joomla.html.pagination');
 	    $pageNav = new JPagination($tot, $limitstart, $limit);
-		
+
 		$arrayLuceneFilter = array();
 		// Invoke luceneFilter() method from plugin
 		if (!empty($this->pluginLucene)) {
 			foreach ($this->pluginLucene as $plugin) {
-				$arrayLuceneFilter = $arrayLuceneFilter + $plugin->luceneFilter();	
-			}	
+				$arrayLuceneFilter = $arrayLuceneFilter + $plugin->luceneFilter();
+			}
 		}
-		
+
 		$this->assign('luceneFilters', $arrayLuceneFilter);
 		$this->assign('lucene', $lucene);
 		$this->assign('fieldNames', $fieldNames);
@@ -164,10 +164,10 @@ class JifileViewLucene extends JViewLegacy {
 		$this->assign('listFilter', $filter);
 		$this->assign('pagination', $pageNav);
 		$this->assign('basepath', $basepath);
-				
+
 		parent::display($tpl);
 	}
-	
+
 	function getDocuments($lucene) {
 		$result = array();
 		if(empty($lucene)) {
@@ -180,7 +180,7 @@ class JifileViewLucene extends JViewLegacy {
 		}
 		return $result;
 	}
-	
+
 	function getAllDocuments($index, $tot, $limitstart, $limit) {
 		$result = array();
 
@@ -194,20 +194,20 @@ class JifileViewLucene extends JViewLegacy {
 
 		return $result;
 	}
-	
+
 	function getFilterFields($fieldNames, $filterField = '') {
 		$options = array();
 		$options[] = JHTML::_('select.option', '', '- '.JText::_('ALL_FIELD').' -');
 		foreach ($fieldNames as $key => $value) {
 			$options[] = JHTML::_('select.option', $key, $value);
 		}
-		
+
 		// valore di default (da recuperare dalla request)
 		$selectField = JHTML::_('select.genericlist', $options, 'filter_field', 'class="inputbox"', 'value', 'text', $filterField);
-		
+
 		return $selectField;
 	}
-	
+
 	function getFilterSearchphrases($filterSearchphrases) {
 		$searchphrases 		= array();
 		$searchphrases[] 	= JHTML::_('select.option',  'any', JText::_( 'ANY_WORDS' ) );
@@ -215,37 +215,32 @@ class JifileViewLucene extends JViewLegacy {
 		$searchphrases[] 	= JHTML::_('select.option',  'exact', JText::_( 'EXACT_PHRASE' ) );
 		$searchphrases[] 	= JHTML::_('select.option',  'wildcard', JText::_( 'PARTIAL_PHRASE' ) );
 		$selectSearchphrases = JHTML::_('select.genericlist',  $searchphrases, 'filter_searchphrases', '', 'value', 'text', $filterSearchphrases);
-		
+
 		return $selectSearchphrases;
 	}
-	
+
 	function setToolbar($option, $all = true) {
 		$canDo = jifilehelper::getActions();
-		
+
 		JToolBarHelper::title('JiFile ['.JText::_('index').']', 'logo');
-		
+
 		// Invoke setToolbar() method from plugin
 		if (!empty($this->pluginLucene)) {
 			foreach ($this->pluginLucene as $plugin) {
-				$plugin->setToolbar();	
-			}	
+				$plugin->setToolbar();
+			}
 		}
-		
+
 		JToolBarHelper::help('JiFle Configuration', '', 'http://www.isapp.it/documentazione-jifile/24-lindice-di-jifile.html');
 		JToolBarHelper::divider();
 		$bar = JToolBar::getInstance('toolbar');
 		$bar->appendButton( 'Link', 'cache', 'CLEAR_CACHE', 'index.php?option='.$option.'&task=clearCache&from=lucene' );
 		JToolBarHelper::divider();
 		if($all) {
-			
-			if (AdapterForJoomlaVersion::getInstance()->is(AdapterForJoomlaVersion::JOOMLA_2X)) {
-				$bar->appendButton( 'Link', 'optimize','Optimize', 'index.php?option=com_jifile&task=lucene.startoptimize&view=optimize&tmpl=component" onclick="jQuery.colorbox({ href: this.href, width: \'500px\', height: \'400px\' }); return false;' );
-			} else {
-				$title = JText::_('OPTIMIZE');
-				$dhtml = "<a class=\"btn btn-small\" id=\"btnOptimize\" href=\"index.php?option=com_jifile&amp;task=lucene.startoptimize&amp;view=optimize&amp;tmpl=component\">
-				<span class=\"icon-lightning\"></span>$title</a>";
-				$bar->appendButton('Custom', $dhtml, 'optimize');
-			}
+			$title = JText::_('OPTIMIZE');
+			$dhtml = "<a class=\"btn btn-small\" id=\"btnOptimize\" href=\"index.php?option=com_jifile&amp;task=lucene.startoptimize&amp;view=optimize&amp;tmpl=component\">
+			<span class=\"icon-lightning\"></span>$title</a>";
+			$bar->appendButton('Custom', $dhtml, 'optimize');
 			JToolBarHelper::deleteList(JText::_('ARE_YOU_SURE_TO_DELETE_THE_SELECTED_FILES').'?', 'lucene.delete', 'DELETE');
 			$bar->appendButton( 'Confirm', JText::_('ARE_YOU_SURE_TO_DELETE_ALL_FILES').'?', 'delete_all', 'DELETE_ALL', 'lucene.deleteAll', false);
 			JToolBarHelper::divider();
@@ -257,7 +252,7 @@ class JifileViewLucene extends JViewLegacy {
 		}
 		JRequest::setVar('hidemainmenu', 1);
 	}
-	
+
 	function setDocument() {
 		$doc = JFactory::getDocument();
 		$doc->addStyleSheet( '../administrator/components/com_jifile/css/ifile.css?'.JIFILEVER );
@@ -267,12 +262,12 @@ class JifileViewLucene extends JViewLegacy {
 								    	jQuery('a[rel*=modalx]').colorbox({maxWidth: '800px'});
 										jQuery('#btnOptimize').colorbox({width: '500px', height: '400px'});
 								    })" );
-									
+
 		// Invoke setDocument() method from plugin
 		if (!empty($this->pluginLucene)) {
 			foreach ($this->pluginLucene as $plugin) {
-				$plugin->setDocument();	
-			}	
+				$plugin->setDocument();
+			}
 		}
 	}
 }

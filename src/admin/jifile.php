@@ -11,12 +11,12 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\CMS\Factory;
 
+if(!defined('DS')){
+	define('DS',DIRECTORY_SEPARATOR);
+}
+
 require_once 'version.php';
 require_once JPATH_COMPONENT.'/helpers/jifilehelper.php';
-// Adapter for Joomla version
-require_once ("helpers/adapter/adapterforjoomlaversion.php");
-
-$jAdapter = AdapterForJoomlaVersion::getInstance();
 //define('JIFILE_ADDON_PATH', JPATH_COMPONENT.'/addon');
 //define('JIFILE_ADDON_PLUGIN_PATH', JPATH_COMPONENT.'/addon/plugins');
 

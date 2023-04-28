@@ -867,13 +867,7 @@ class jifilehelper {
 		$pathIfile = '../administrator/components/com_jifile/';
 		$doc = JFactory::getDocument();
 
-		if (AdapterForJoomlaVersion::getInstance()->is(AdapterForJoomlaVersion::JOOMLA_3X)) {
-			JHtml::_('jquery.framework');
-		} else {
-			$doc->addScript( $pathIfile.'js/jquery/jquery.min.js?1.9.1' );
-			$doc->addScript( $pathIfile.'js/jquery/jquery-noconflict.js' );
-			//$doc->addScriptDeclaration ( "jQuery.noConflict();" );
-		}
+		JHtml::_('jquery.framework');
 
 		foreach ($plugins as $plugin) {
 			switch ($plugin) {

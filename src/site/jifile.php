@@ -12,9 +12,6 @@ defined('_JEXEC') or die;
 
 require_once JPATH_COMPONENT_ADMINISTRATOR.'/version.php';
 require_once JPATH_COMPONENT_ADMINISTRATOR.'/helpers/jifilehelper.php';
-// Adapter for Joomla version
-require_once JPATH_COMPONENT_ADMINISTRATOR.'/helpers/adapter/adapterforjoomlaversion.php';
-$jAdapter = AdapterForJoomlaVersion::getInstance();
 
 // define path addon controller
 $config = array();
@@ -27,7 +24,7 @@ $controller = JControllerLegacy::getInstance('Jifile', $config);
 
 // Perform the Request task
 $controller->execute(JRequest::getCmd('task'));
- 
+
 // Redirect if set by the controller
 $controller->redirect();
 

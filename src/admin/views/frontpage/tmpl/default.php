@@ -7,7 +7,6 @@
 * @link		http://jifile.isapp.it
 */
 defined('_JEXEC') or die('Restricted access');
-$jAdapter = AdapterForJoomlaVersion::getInstance();
 ?>
 
-<?php echo $this->loadTemplate('j'.$jAdapter->getJoomlaVersion()); ?>
+<?php echo $this->loadTemplate('j3'); ?>

@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
 * @subpackage	com_jifile
 * @author		Antonio Di Girolamo & Giampaolo Losito
@@ -6,14 +6,12 @@
 * @license		http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
 * @link		http://jifile.isapp.it
 */
-defined('_JEXEC') or die('Restricted access'); 
+defined('_JEXEC') or die('Restricted access');
 
 $ahrefPref = '<a rel="{handler: \'iframe\', size: {x: 875, y: 550}, onClose: function() {}}" href="index.php?option=com_config&amp;view=component&amp;component=com_jifile&amp;path=&amp;tmpl=component" class="modal">'.JText::_('Configure').'</a>';
-if (AdapterForJoomlaVersion::getInstance()->is(AdapterForJoomlaVersion::JOOMLA_3X)) {
-	$uri = (string) JUri::getInstance();
-	$return = urlencode(base64_encode($uri));
-	$ahrefPref = '<a href="index.php?option=com_config&amp;view=component&amp;component=com_jifile&amp;path=&amp;return='.$return.'">'.JText::_('Configure').'</a>';
-}
+$uri = (string) JUri::getInstance();
+$return = urlencode(base64_encode($uri));
+$ahrefPref = '<a href="index.php?option=com_config&amp;view=component&amp;component=com_jifile&amp;path=&amp;return='.$return.'">'.JText::_('Configure').'</a>';
 ?>
 
 <div class="row-fluid">
@@ -42,7 +40,7 @@ if (AdapterForJoomlaVersion::getInstance()->is(AdapterForJoomlaVersion::JOOMLA_3
 	  </tbody>
 	  <?php } ?>
 	</table>
-	
+
 	<table class="adminlist table table-striped span6">
 	  <caption><?php echo JText::_('index') ?></caption>
 	  <thead>

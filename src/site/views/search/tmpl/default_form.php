@@ -10,17 +10,14 @@
 defined('_JEXEC') or die;
 $lang = JFactory::getLanguage();
 $upper_limit = $lang->getUpperLimitSearchWord();
-$jAdapter = AdapterForJoomlaVersion::getInstance();
 ?>
 
 <form id="searchForm" action="<?php echo JRoute::_('index.php?option=com_jifile');?>" method="post">
 
 	<fieldset class="word">
-		<?php if ($jAdapter->getJoomlaVersion() != AdapterForJoomlaVersion::JOOMLA_3X) { ?>
-			<label for="search-searchword">
-				<?php echo JText::_('COM_JIFILE_SEARCH_KEYWORD'); ?>
-			</label>
-		<?php } ?>
+		<label for="search-searchword">
+			<?php echo JText::_('COM_JIFILE_SEARCH_KEYWORD'); ?>
+		</label>
 		<div class="input-append">
 			<input type="text" name="searchword" id="search-searchword" placeholder="<?php echo JText::_('COM_JIFILE_SEARCH_KEYWORD'); ?>" size="30" maxlength="<?php echo $upper_limit; ?>" value="<?php echo $this->escape($this->origkeyword); ?>" class="inputbox" />
 			<button name="Search" onclick="this.form.submit()" class="button btn"><?php echo JText::_('COM_JIFILE_SEARCH');?></button>

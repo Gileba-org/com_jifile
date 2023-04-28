@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
 * @subpackage	com_jifile
 * @author		Antonio Di Girolamo & Giampaolo Losito
@@ -6,7 +6,7 @@
 * @license		http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
 * @link		http://jifile.isapp.it
 */
-defined('_JEXEC') or die('Restricted access'); 
+defined('_JEXEC') or die('Restricted access');
 ?>
 
 <?php JHTML::_('behavior.tooltip'); ?>
@@ -19,12 +19,12 @@ defined('_JEXEC') or die('Restricted access');
 			<tr>
 				<th width="1%">
 					<input type="checkbox" name="checkall-toggle" value="" title="<?php echo JText::_('JGLOBAL_CHECK_ALL'); ?>" onclick="Joomla.checkAll(this)" />
-				</th>				
+				</th>
 				<th width="3%">
-					<?php echo JText::_('JIFILE_ICON'); ?>					
+					<?php echo JText::_('JIFILE_ICON'); ?>
 				</th>
 				<th width="15%" class="center">
-					<?php echo JText::_('JIFILE_NAME'); ?>					
+					<?php echo JText::_('JIFILE_NAME'); ?>
 				</th>
 				<th width="10%" class="center">
 					<?php echo JText::_('JIFILE_CONTEXT'); ?>
@@ -46,7 +46,7 @@ defined('_JEXEC') or die('Restricted access');
 				</th>
 				<th width="2%">
 					<?php echo JText::_('JIFILE_ACTIVE'); ?>
-				</th>	
+				</th>
 				<th width="2%">
 					<?php echo JText::_('JIFILE_ADDON_CHECK_REPORT'); ?>
 				</th>
@@ -61,7 +61,7 @@ defined('_JEXEC') or die('Restricted access');
 		</tfoot>
 		<tbody>
 		<?php foreach ($this->addon as $i => $item) :
-		
+
 			$manifest = $this->getManifestInfo($item);
 //			$ordering	= ($listOrder == 'ordering');
 //			$item->cat_link = JRoute::_('index.php?option=com_categories&extension=com_banners&task=edit&type=other&cid[]='. $item->catid);
@@ -73,24 +73,24 @@ defined('_JEXEC') or die('Restricted access');
 			<tr class="row<?php echo $i % 2; ?>">
 				<td class="center">
 					<?php
-						if ($item['core'] == 0 || $item['delete'] == 1) { 
+						if ($item['core'] == 0 || $item['delete'] == 1) {
 							echo JHtml::_('grid.id', $i, $item['id']);
 						}
 					?>
 				</td>
 				<td class="center">
 					<?php
-					// if image exists 
+					// if image exists
 					if (!empty($item['image'])) {
 						$image = $item['image'];
-						//echo "<img width=\"16px\" height=\"16px\" src=\"".$item['image']."\" alt=\"".JText::_($item['title'])."\" />";	
+						//echo "<img width=\"16px\" height=\"16px\" src=\"".$item['image']."\" alt=\"".JText::_($item['title'])."\" />";
 					} else {
 						$image = "components/com_jifile/images/icons/star_64.png";
-					} 
-					
+					}
+
 					echo "<img width=\"16px\" height=\"16px\" src=\"".$image."\" alt=\"".JText::_($item['title'])."\" />";
 					?>
-				</td>				
+				</td>
 				<td class="center">
 					<?php echo $item['addon']; ?>
 				</td>
@@ -115,33 +115,25 @@ defined('_JEXEC') or die('Restricted access');
 					<span class="badge badge-info"><?php echo JText::_($item['version']); ?></span>
 				</td>
 				<td class="center">
-					<?php						
-						if ($item['core'] == 0) { 
+					<?php
+						if ($item['core'] == 0) {
 							echo JHtml::_('jgrid.published', $item['published'], $i, 'addon.');
 						} else {
 							//echo JHtml::_('jgrid.published', 0, $i, 'addon.', false);
-							if (AdapterForJoomlaVersion::getInstance()->is(AdapterForJoomlaVersion::JOOMLA_3X)) {
-								echo "<i class=\"icon-publish\"></i>";
-							} else {
-								echo "<span class=\"jgrid\"><span class=\"state protected\"></span></span>";
-							}
+							echo "<i class=\"icon-publish\"></i>";
 						}
 					?>
 				</td>
 				<td class="center">
-					<?php	
+					<?php
 						if ($item['checkReport'] == false) {
-							if (AdapterForJoomlaVersion::getInstance()->is(AdapterForJoomlaVersion::JOOMLA_3X)) {
-								$icon = "<i class=\"icon-warning\"></i>";
-							} else {
-								$icon = "<span class=\"jgrid\"><span class=\"state warning\"></span></span>";
-							}
-							
-							
-							echo "<a href=\"index.php?option=com_jifile&task=addon.checkreport&view=checkreport&tmpl=component&plugin={$item['id']}\" 
-									 onclick=\"jQuery.colorbox({ href: this.href, width: '85%', height: '85%', iframe: true }); return false;\">								
+							$icon = "<i class=\"icon-warning\"></i>";
+
+
+							echo "<a href=\"index.php?option=com_jifile&task=addon.checkreport&view=checkreport&tmpl=component&plugin={$item['id']}\"
+									 onclick=\"jQuery.colorbox({ href: this.href, width: '85%', height: '85%', iframe: true }); return false;\">
 									 {$icon}
-								  </a>";						
+								  </a>";
 						} else {
 							echo "&nbsp";
 						}

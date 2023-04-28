@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
 * @subpackage	com_jifile
 * @author		Antonio Di Girolamo & Giampaolo Losito
@@ -6,11 +6,10 @@
 * @license		http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
 * @link		http://jifile.isapp.it
 */
-defined('_JEXEC') or die('Restricted access'); 
-$jAdapter = AdapterForJoomlaVersion::getInstance();
-?>  
+defined('_JEXEC') or die('Restricted access');
+?>
 
-<?php echo $this->loadTemplate('j'.$jAdapter->getJoomlaVersion()); ?>
+<?php echo $this->loadTemplate('j3'); ?>
 
 <script type="text/javascript">
 <!--

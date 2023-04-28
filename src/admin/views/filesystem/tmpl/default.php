@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
 * @subpackage	com_jifile
 * @author		Antonio Di Girolamo & Giampaolo Losito
@@ -6,7 +6,7 @@
 * @license		http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
 * @link		http://jifile.isapp.it
 */
-defined('_JEXEC') or die('Restricted access');  
+defined('_JEXEC') or die('Restricted access');
 if(isset($this->error_pref)) {
 	echo $this->error_pref;
 } else {
@@ -22,9 +22,9 @@ if(isset($this->error_pref)) {
 </div>
 <div>
 	<p style="color:green;"><small>
-		<?php 
+		<?php
 			$extAllows = "<strong>".implode(", ", $this->extensionsAllows)."</strong>";
-			echo sprintf(JText::_('JIFILE_EXTENSIONS_AUTOINDEX'), $extAllows); 
+			echo sprintf(JText::_('JIFILE_EXTENSIONS_AUTOINDEX'), $extAllows);
 		?></small>
 	</p>
 </div>
@@ -44,18 +44,18 @@ if(isset($this->error_pref)) {
 
 	<ul class="breadcrumb">
 		<li><?php echo JText::_( 'CURRENT_DIRECTORY' ); ?>:</li>
-		<?php 
+		<?php
 			$linkDir = 'index.php?option=com_jifile&task=filesystem.&dir=';
 			$current = '';
 			if(!empty($this->dir)) {
-				?><li><a href="<?php echo $linkDir ?>" title="<?php echo JText::_('OPEN_DIR').' '.$this->basepath ?>"><?php echo jifilehelper::encodingCharset(jifilehelper::getCorrectPath($this->basepath, false, false)) ?></a><span class="divider"><?php echo DS ?></span></li></li><?php 
+				?><li><a href="<?php echo $linkDir ?>" title="<?php echo JText::_('OPEN_DIR').' '.$this->basepath ?>"><?php echo jifilehelper::encodingCharset(jifilehelper::getCorrectPath($this->basepath, false, false)) ?></a><span class="divider"><?php echo DS ?></span></li></li><?php
 				$listDir = explode(DS, $this->dir);
 				$listDir = array_filter($listDir);
 				$current = array_pop($listDir).DS;
 				$toDir = '';
 				foreach ($listDir as $dir) {
 					$toDir .= $dir.DS;
-					?><li><a href="<?php echo $linkDir.urlencode($toDir) ?>" title="<?php echo JText::_('OPEN_DIR').' '.$dir.DS ?>"><?php echo jifilehelper::encodingCharset($dir) ?></a><span class="divider"><?php echo DS ?></span></li><?php 
+					?><li><a href="<?php echo $linkDir.urlencode($toDir) ?>" title="<?php echo JText::_('OPEN_DIR').' '.$dir.DS ?>"><?php echo jifilehelper::encodingCharset($dir) ?></a><span class="divider"><?php echo DS ?></span></li><?php
 				}
 				echo '<li class="active">'.jifilehelper::encodingCharset($current).'</li>';
 			} else {
@@ -63,9 +63,9 @@ if(isset($this->error_pref)) {
 			}
 		?>
 	</ul>
-	
+
 	<table id="ifile" class="adminlist table table-hover">
-		<thead>				
+		<thead>
 			<tr>
 				<th width="4%"><input type="checkbox" name="toggle" value="" onclick="Joomla.checkAll(this)" /></th>
 	            <th width="40%" class="title"><?php echo JText::_( 'Name' );?></th>
@@ -79,21 +79,19 @@ if(isset($this->error_pref)) {
 			<tr>
 				<td colspan="7">
 					<div class="pull-left"><?php echo $this->pagination->getListFooter(); ?></div>
-					<?php if (AdapterForJoomlaVersion::getInstance()->is(AdapterForJoomlaVersion::JOOMLA_3X)) { ?>
 					<div class="pull-left"><?php echo $this->pagination->getLimitBox(); ?></div>
-					<?php } ?>
 				</td>
 			</tr>
 		</tfoot>
 		<tbody>
 		<?php $i = $row = 0;
-			foreach ($this->listfile as $key => $file) : 
+			foreach ($this->listfile as $key => $file) :
 				$this->loadInfoFile($file);
 				$linkDir = false;
 				if($this->infofile['mime'] == 'dir') {
 					$dir = $this->dir.$this->infofile['name'];
 					if($this->infofile['name'] == '..'.DS) {
-						//$dir = empty($listDir) ? '' : end($listDir).DS; 
+						//$dir = empty($listDir) ? '' : end($listDir).DS;
 						$dir = implode(DS, $listDir).DS;
 					}
 					$linkDir 	= 'index.php?option=com_jifile&task=filesystem.&dir='.urlencode($dir);
@@ -101,11 +99,11 @@ if(isset($this->error_pref)) {
 		?>
 			<tr class="<?php echo 'row'.($row%2); ?>">
 				<td>
-					<?php 
-						if(substr($this->infofile['name'], 0, 2) != '..') { 
+					<?php
+						if(substr($this->infofile['name'], 0, 2) != '..') {
 					?>
-						<input type="checkbox" id="cb<?php echo $i; ?>" 
-							<?php echo (($this->infofile['mime'] != 'dir' && $this->infofile['indexed'] === 'ajax') ? 'class="checkIndex'.$i.'"' : '') ?> 
+						<input type="checkbox" id="cb<?php echo $i; ?>"
+							<?php echo (($this->infofile['mime'] != 'dir' && $this->infofile['indexed'] === 'ajax') ? 'class="checkIndex'.$i.'"' : '') ?>
 							name="file[<?php echo $i; ?>]" value="<?php echo urlencode($file) ?>" onclick="Joomla.isChecked(this.checked);"
 							<?php echo (!in_array(strtolower($this->infofile['ext']), $this->extensionsAllows) && $this->infofile['mime'] != 'dir') ? 'disabled' : ''; ?> />
 					<?php } ?>
@@ -113,8 +111,8 @@ if(isset($this->error_pref)) {
 				<td>
 				<?php if($linkDir) { ?>
 					<a class="icon-16-folder iconFile" href="<?php echo $linkDir ?>" title="<?php echo JText::_('OPEN_DIR').' '.$this->infofile['nameview'] ?>"><?php echo $this->infofile['nameview'] ?></a>
-				<?php } else { 
-					echo '<span class="icon-16-'.strtolower($this->infofile['ext']).' iconFile"><a title="Download" href="index.php?option=com_jifile&task=filesystem.download&filename='.$this->basepath.$this->dir.urlencode($this->infofile['name']).'">'.$this->infofile['nameview'].'</a></span>'; 
+				<?php } else {
+					echo '<span class="icon-16-'.strtolower($this->infofile['ext']).' iconFile"><a title="Download" href="index.php?option=com_jifile&task=filesystem.download&filename='.$this->basepath.$this->dir.urlencode($this->infofile['name']).'">'.$this->infofile['nameview'].'</a></span>';
 				} ?>
 				</td>
 				<td class="small"><?php echo $this->infofile['date'] ?></td>
@@ -122,7 +120,7 @@ if(isset($this->error_pref)) {
 				<td style="text-align:right">
 					<?php if (!empty($this->infofile['size'])) { ?><span class="label label-info"><?php echo $this->infofile['size'] ?></span><?php } ?>
 				</td>
-				<?php 
+				<?php
 					if($this->infofile['mime'] != 'dir') {
 						?>
 						<td style="text-align:center" class="indexed" id="indexed<?php echo $i ?>">
@@ -130,18 +128,18 @@ if(isset($this->error_pref)) {
 							if($this->infofile['indexed'] === true) {
 								?>
 								<img src="components/com_jifile/images/tick.png" title="<?php echo JText::_('INDEXED'); ?>" />
-								<?php 
+								<?php
 							} else {
 								?>
-								<img src="components/com_jifile/images/publish_x.png" title="<?php echo JText::_('NO_INDEXED'); ?>" /><a 
-								href="index.php?option=com_jifile&task=lucene.indexing&view=manualindex&tmpl=component&filename=<?php echo urlencode($this->infofile['filename']) ?>&id=<?php echo $i ?>" 
-								onclick="jQuery.colorbox({ href: this.href, width: '85%', height: '85%', iframe: true }); return false;"><img 
+								<img src="components/com_jifile/images/publish_x.png" title="<?php echo JText::_('NO_INDEXED'); ?>" /><a
+								href="index.php?option=com_jifile&task=lucene.indexing&view=manualindex&tmpl=component&filename=<?php echo urlencode($this->infofile['filename']) ?>&id=<?php echo $i ?>"
+								onclick="jQuery.colorbox({ href: this.href, width: '85%', height: '85%', iframe: true }); return false;"><img
 								src="components/com_jifile/images/filesave.png" title="<?php echo JText::_('MANUAL_INDEXING'); ?>" />
 								</a>
 								<?php if (jifilehelper::inDebug()) { ?>
-								<a 
-								href="index.php?option=com_jifile&task=lucene.index&tmpl=component&file=<?php echo urlencode($this->infofile['filename']) ?>&id=<?php echo $i ?>" 
-								onclick="jQuery.colorbox({ href: this.href, width: '65%', height: '65%', iframe: true }); return false;"><img 
+								<a
+								href="index.php?option=com_jifile&task=lucene.index&tmpl=component&file=<?php echo urlencode($this->infofile['filename']) ?>&id=<?php echo $i ?>"
+								onclick="jQuery.colorbox({ href: this.href, width: '65%', height: '65%', iframe: true }); return false;"><img
 								src="components/com_jifile/images/bug.png" title="<?php echo JText::_('Debug'); ?>" /></a>
 								<?php }
 							}
@@ -151,14 +149,14 @@ if(isset($this->error_pref)) {
 					} else {
 						?>
 						<td style="text-align:center" class="indexed"></td>
-						<?php 
+						<?php
 					}
 				?>
 			</tr>
-		<?php 
+		<?php
 			$i++;
 			$row++;
-			endforeach; 
+			endforeach;
 		?>
 		</tbody>
 	</table>
@@ -173,8 +171,6 @@ if(isset($this->error_pref)) {
 	<?php echo JHTML::_( 'form.token' ); ?>
 </form>
 <?php } //nessun index path configurato
-if (AdapterForJoomlaVersion::getInstance()->is(AdapterForJoomlaVersion::JOOMLA_3X)) {
 	echo $this->loadTemplate('indexesmodal');
-}
 ?>
 <?php echo jifilehelper::getFirma(); ?>

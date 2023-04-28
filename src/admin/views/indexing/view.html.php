@@ -10,18 +10,16 @@ defined('_JEXEC') or die();
 jimport( 'joomla.application.component.view' );
 
 class JifileViewIndexing extends JViewLegacy {
-	
+
 	function display($tpl = null) {
 		$tpl = JRequest::getVar('tmpl', null);
-		
+
 		if(!is_null($tpl)) {
 			$doc = JFactory::getDocument();
-			
-			if (AdapterForJoomlaVersion::getInstance()->is(AdapterForJoomlaVersion::JOOMLA_3X)) {
-				JHtml::_('behavior.framework');
-				jifilehelper::addJQuery();
-			}
-			
+
+			JHtml::_('behavior.framework');
+			jifilehelper::addJQuery();
+
 			$doc->addScript( '../administrator/components/com_jifile/js/indexing.js?'.JIFILEVER );
 			$doc->addStyleSheet( '../administrator/components/com_jifile/css/ifile.css?'.JIFILEVER );
 		}
