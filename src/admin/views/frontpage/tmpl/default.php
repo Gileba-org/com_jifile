@@ -11,5 +11,3 @@ $jAdapter = AdapterForJoomlaVersion::getInstance();
 ?>
 
 <?php echo $this->loadTemplate('j'.$jAdapter->getJoomlaVersion()); ?>
-
-<?php echo jifilehelper::getFirma(); ?>

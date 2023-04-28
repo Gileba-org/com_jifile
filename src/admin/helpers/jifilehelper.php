@@ -1104,11 +1104,6 @@ class jifilehelper {
 		return $text;
 	}
 
-	public static function getFirma() {
-		$firma = '<div id="firma"><a href="http://jifile.isapp.it" target="_blank">JiFile '.JIFILEVER.' - isApp.it</a></div>';
-		return $firma;
-	}
-
 	public static function parseXMLInstallFile($path)
 	{
 		JLog::add('JApplicationHelper::parseXMLInstallFile is deprecated. Use JInstaller::parseXMLInstallFile instead.', JLog::WARNING, 'deprecated');
