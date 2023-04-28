@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
 * @subpackage	com_jifile
 * @author		Antonio Di Girolamo & Giampaolo Losito
@@ -6,7 +6,7 @@
 * @license		http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
 * @link		http://jifile.isapp.it
 */
-defined('_JEXEC') or die('Restricted access'); 
+defined('_JEXEC') or die('Restricted access');
 ?>
 <div class="row-fluid">
 	<!-- Begin Content -->
@@ -29,10 +29,6 @@ defined('_JEXEC') or die('Restricted access');
 				<?php echo $this->loadTemplate('update'); ?>
 			<?php echo JHtml::_('bootstrap.endTab'); ?>
 
-			<?php echo JHtml::_('bootstrap.addTab', 'jifileTab', 'donation', '<span class="icon-plus icon-thumbs-up"></span> '.JText::_('DONATE', true)); ?>
-				<?php echo $this->loadTemplate('donation'); ?>
-			<?php echo JHtml::_('bootstrap.endTab'); ?>
-			
 			<?php echo JHtml::_('bootstrap.addTab', 'jifileTab', 'help', '<span class="icon-question-sign"></span> '.JText::_('JIFILE_HELP', true)); ?>
 				<?php echo $this->loadTemplate('help'); ?>
 			<?php echo JHtml::_('bootstrap.endTab'); ?>
