@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Leggi il file readme.txt per la descrizione dei TAG del file IFileConfig.xml
+ */
+-->
+<ifile>
+  <duplicate>0</duplicate>
+  <root-application>/data/sites/web/gilebabe/subsites/test.gileba.be/jifile/</root-application>
+  <encoding>ISO-8859-15</encoding>
+  <server bit="64"/>
+  <doctotxt type="PHP" encoding=""/>
+  <zend-document>
+    <fields>
+      <field name="introtext" type="UnIndexed"/>
+      <field name="body" type="UnStored"/>
+      <field name="title" type="Text"/>
+      <field name="subject" type="Text"/>
+      <field name="description" type="Text"/>
+      <field name="creator" type="Text"/>
+      <field name="keywords" type="Keyword"/>
+      <field name="created" type="Keyword"/>
+      <field name="modified" type="Keyword"/>
+      <field name="pages" type="UnStored"/>
+    </fields>
+  </zend-document>
+  <analyzer>
+    <type>
+      <default>Utf8Num_CaseInsensitive</default>
+    </type>
+  </analyzer>
+</ifile>
