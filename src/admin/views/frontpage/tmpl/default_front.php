@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
 * @subpackage	com_jifile
 * @author		Antonio Di Girolamo & Giampaolo Losito
@@ -16,17 +16,17 @@ defined('_JEXEC') or die('Restricted access'); ?>
 
 	foreach ($addons as $addon) {
 		foreach ($addon as $values) {
-			// define access (ACL) 
-			if (empty($values['rules']) || $this->canDo->get($values['rules'])) {
+			// define access (ACL)
+			if (empty($values['rules']) || $this->canDo->get('rules')) {
 				list($context, $id) = explode(".", $values['addon']);
 				// after tree box left, create un clear
 					echo "\n<div class=\"icon span1\">";
 						// management type of link (component - external link)
 						switch ($values['type']) {
-							case '0': // component Joomla!												
+							case '0': // component Joomla!
 								// create href
-								$strHref = $this->getHrefAddon($values);								
-								
+								$strHref = $this->getHrefAddon($values);
+
 								echo "<a id=\"{$id}\" href=\"index.php?{$strHref}\" title=".JText::_($values['title'])." ";
 								// define onclick
 								if (!empty($values['onclick'])) {
@@ -46,15 +46,15 @@ defined('_JEXEC') or die('Restricted access'); ?>
 								echo " >"; // close anchor
 								break;
 							default:
-								// @TODO define message												
+								// @TODO define message
 								break;
 						}
-						
-						// if image exists 
+
+						// if image exists
 						if (!empty($values['image'])) {
-							echo '<img id="'.$id.'" src="'.$values['image'].'" alt="'.JText::_($values['title']).'" />';	
-						} 
-						
+							echo '<img id="'.$id.'" src="'.$values['image'].'" alt="'.JText::_($values['title']).'" />';
+						}
+
 						echo "<br />";
 						echo "<span>".JText::_($values['title'])."</span>";
 						echo "</a>";

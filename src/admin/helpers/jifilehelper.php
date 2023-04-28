@@ -9,14 +9,17 @@
 // No direct access
 defined('_JEXEC') or die('Restricted access');
 
-// addon 
+use Joomla\CMS\Factory;
+use Joomla\CMS\Helper\ContentHelper;
+
+// addon
 if (!defined('JIFILE_ADDON_PATH')) {
 	define('JIFILE_ADDON_PATH', JPATH_ADMINISTRATOR.'/components/com_jifile/addon');
 }
 if (!defined('JIFILE_ADDON_PATH_SITE')) {
 	define('JIFILE_ADDON_PATH_SITE', JPATH_BASE.'/components/com_jifile/addon');
 }
-// plugin 
+// plugin
 if (!defined('JIFILE_ADDON_PLUGIN_PATH')) {
 	define('JIFILE_ADDON_PLUGIN_PATH', JPATH_ADMINISTRATOR.'/components/com_jifile/addon/plugins');
 }
@@ -30,29 +33,29 @@ if (!defined('JPATH_IFILE_LIBRARY')) {
 }
 
 class jifilehelper {
-	
+
 	/**
-	 * Restituisce il path dell'indice configurato dai parametri 
-	 * 
+	 * Restituisce il path dell'indice configurato dai parametri
+	 *
 	 * @return mixed
 	 */
 	static function getIndexPath() {
 		$params = JComponentHelper::getParams( 'com_jifile' );
 		return jifilehelper::getCorrectPath($params->get( 'index_path' ), true);
 	}
-	
+
 	/**
 	 * Restituisce il path pulito
-	 * 
+	 *
 	 * @param path $path
 	 * @param bool $startSlash [optional]
 	 * @param bool $endSlash [optional]
 	 * @return path
 	 */
 	static function getCorrectPath($path, $startSlash = false, $endSlash = true) {
-		
+
 		$ds = DIRECTORY_SEPARATOR;
-		
+
 		if(empty($path)) {
 			return null;
 		}
@@ -78,13 +81,13 @@ class jifilehelper {
 				$path = substr($path, 0, $cc);
 			}
 		}
-		
+
 		return $path;
 	}
-	
+
 	/**
-	 * Return Jommla! Path Site for resolved the index on different server 
-	 * @return 
+	 * Return Jommla! Path Site for resolved the index on different server
+	 * @return
 	 */
 	static function getRootApplication() {
 //		$params = &JComponentHelper::getParams( 'com_jifile' );
@@ -96,15 +99,15 @@ class jifilehelper {
 //			jifilehelper::saveParams(array('root-application'=>$rootApp));
 //		}
 		//@TODO
-		// capire se è anche possibile definire una RootPath che non sia quella 
+		// capire se è anche possibile definire una RootPath che non sia quella
 		// di Joomla. Forse si potrebbe inserire nella "Opzioni"
 		$rootApp = JPATH_SITE.DS;
 		return $rootApp;
 	}
-	
+
 	static function checkPathConfig(&$rootApp) {
 		$rootApp = jifilehelper::getRootApplication();
-		
+
 		$params = JComponentHelper::getParams( 'com_jifile' );
 		$basepath = jifilehelper::getCorrectPath($params->get( 'base_path' ));
 		if(empty($basepath) || empty($rootApp)) {
@@ -115,9 +118,9 @@ class jifilehelper {
 		}
 		return true;
 	}
-	
+
 	static function retrievePath($pathFilename, $no_basepath = false){
-		
+
 		$params = JComponentHelper::getParams( 'com_jifile' );
 		$basepath = jifilehelper::getCorrectPath($params->get( 'base_path' ));
 		$realpath = realpath(JPATH_SITE.DS.$basepath);
@@ -125,7 +128,7 @@ class jifilehelper {
 		$basepath = str_replace(JPATH_SITE, '', $realpath);
 		$basepath = empty($basepath) ? JPATH_SITE : $basepath;
 		$basepath = jifilehelper::getCorrectPath($params->get( 'base_path' ), true, true);
-		
+
 		$filename = '';
 		if(($pos = strpos($pathFilename, $basepath)) !== false) {
 			$filename = substr($pathFilename, $pos+strlen($basepath));
@@ -140,26 +143,26 @@ class jifilehelper {
 		}
 		return false;
 	}
-	
+
 	static function getCorrectFilename($name, $getFull = false) {
 		$name = jifilehelper::getCorrectPath($name, false, false);
-		
+
 		$rootApp = jifilehelper::getRootApplication();
-		
+
 		if (file_exists($rootApp.DS.$name)) {
 			return ($getFull) ? $rootApp.DS.$name : $name;
 		}
 		return false;
 	}
-	
+
 	/**
-	 * Ritorna una stringa con la dimensione nel corretto formato 
+	 * Ritorna una stringa con la dimensione nel corretto formato
 	 *
 	 * @param int $size
 	 * @return string
 	 */
 	static function getFormatSize($size) {
-		
+
 		$kb = 1024;
         $mb = 1024 * $kb;
         $gb = 1024 * $mb;
@@ -186,15 +189,15 @@ class jifilehelper {
 
 		return $format;
 	}
-	
+
 	/**
 	 * Ritorna la stringa del Mime Type di un file in funzione dell'estensione
-	 * 
+	 *
 	 * @param string $ext
 	 * @return string
 	 */
 	static function getMimetype($ext) {
-		
+
 		$mime_extension_map = array(
 		    '3ds' => 'image/x-3ds',
 		    'BLEND' => 'application/x-blender',
@@ -656,26 +659,26 @@ class jifilehelper {
 		    'ppsx' => 'application/vnd.openxmlformats'
 		    );
 		$ext = strtolower($ext);
-		return (isset($mime_extension_map[$ext])) ? $mime_extension_map[$ext] : 'none'; 
+		return (isset($mime_extension_map[$ext])) ? $mime_extension_map[$ext] : 'none';
 	}
-	
+
 	/**
 	 * Ritorna il numero di tutti di match del pattern
 	 * sul nome del file o false in caso di errore
-	 * 
+	 *
 	 * @param string $filename
 	 * @param string $filter
 	 * @param string $ext
 	 * @return int
 	 */
 	static function getRegexSearch($filename, $filter = '', $ext = '*') {
-				
+
 		// creazione delle regular expression
 		// per la ricerca sul nome del file
 		$search = "/".$filter.".*\.".$ext."$/i";
 		$ris 	= preg_match($search, $filename, $test);
-		
-		return $ris; 
+
+		return $ris;
 	}
 
 	static function getDirectorySize($path, $ignore = array())
@@ -719,24 +722,24 @@ class jifilehelper {
 	static function getFileContent($filename) {
 		jimport('joomla.filesystem.file');
 		require_once JPATH_IFILE_LIBRARY.'/ifile/IFileAdapterFactory.php';
-		
+
 		$factory = LuceneAdapterFactory::getInstance();
-		
+
 		$adapter = $factory->getDocFromExt(JFile::getExt($filename));
 
 		if ($adapter === false) {
 			//$this->setError($luceneFactory->getMessageError());
 			return false;
 		}
-		
+
 		// chiamata la metodo per il parser del file
 		$doc = $adapter->loadParserFile($filename);
-		
+
 		if($adapter->getError()) {
 			return false;
 		}
 		try {
-			return $doc->getFieldValue('body');	
+			return $doc->getFieldValue('body');
 		} catch (Exception $e) {
 			return false;
 		}
@@ -753,41 +756,41 @@ class jifilehelper {
 
 	static function initCache($cache_dir = null) {
 		require_once 'Zend'.DS.'Cache.php';
-		
+
 		$cache_dir = is_null($cache_dir) ? JPATH_SITE.DS.'administrator'.DS.'components'.DS.'com_jifile'.DS.'cache' : $cache_dir;
-		
+
 		$frontendOptions = array(
 			'lifetime' => 86400,
 			'automatic_serialization' => true
 		);
-		
+
 		$backendOptions = array(
-			'cache_dir' => $cache_dir, 
+			'cache_dir' => $cache_dir,
 			'automatic_serialization' => true
 		);
-		
+
 		$cache = Zend_Cache::factory(
 			'Core',
 			'File',
 			$frontendOptions,
 			$backendOptions
 		);
-		
+
 		return $cache;
 	}
-	
+
 	static function setCache($cacheId, $data, $tags = array()) {
 		$cache = jifilehelper::initCache();
 		$cache->save($data, $cacheId, $tags);
 	}
-	
+
 	static function getCache($cacheId) {
 		$cache = jifilehelper::initCache();
 		$result = $cache->load($cacheId);
-		
+
 		return $result;
 	}
-	
+
 	static function clearCache($tags = array()) {
 		$cache = jifilehelper::initCache();
 		$mode = Zend_Cache::CLEANING_MODE_ALL;
@@ -796,9 +799,9 @@ class jifilehelper {
 		}
 		$cache->clean($mode, $tags);
 	}
-	
+
 	static function refreshCache() {
-	
+
 		if(!($filesystem = jifilehelper::getCache('filesystem'))) {
 			return null;
 		}
@@ -813,7 +816,7 @@ class jifilehelper {
 			jifilehelper::setCache('filesystem', $filesystem, array('filesystem'));
 		}
 	}
-	
+
 	static function deleteFileCache($file) {
 		if(!($filesystem = jifilehelper::getCache('filesystem'))) {
 			return null;
@@ -823,7 +826,7 @@ class jifilehelper {
 			jifilehelper::setCache('filesystem', $filesystem, array('filesystem'));
 		}
 	}
-	
+
 	static function fileInCache($file, $filetime = null) {
 		if(!($filesystem = jifilehelper::getCache('filesystem'))) {
 			return false;
@@ -837,12 +840,12 @@ class jifilehelper {
 		}
 		return true;
 	}
-	
+
 	static function checkIndex($file, $lucene) {
-	
+
 		$filesystem = jifilehelper::getCache('filesystem');
 		$filetime = filemtime($file);
-		
+
 		$docache = false;
 		if(!$filesystem) {
 			//no cache
@@ -856,14 +859,14 @@ class jifilehelper {
 			$filesystem[$file]['indexed'] = ($lucene->getIdByFile($file) !== false) ? true : false;
 			jifilehelper::setCache('filesystem', $filesystem, array('filesystem'));
 		}
-	
+
 		return $filesystem[$file]['indexed'];
 	}
-	
+
 	static function addJQuery($plugins = array()) {
 		$pathIfile = '../administrator/components/com_jifile/';
 		$doc = JFactory::getDocument();
-		
+
 		if (AdapterForJoomlaVersion::getInstance()->is(AdapterForJoomlaVersion::JOOMLA_3X)) {
 			JHtml::_('jquery.framework');
 		} else {
@@ -871,7 +874,7 @@ class jifilehelper {
 			$doc->addScript( $pathIfile.'js/jquery/jquery-noconflict.js' );
 			//$doc->addScriptDeclaration ( "jQuery.noConflict();" );
 		}
-		
+
 		foreach ($plugins as $plugin) {
 			switch ($plugin) {
 				case 'colorbox':
@@ -884,14 +887,14 @@ class jifilehelper {
 					break;
 			}
 		}
-		
+
 	}
 
 	static function array2Xml($data, $rootNodeName = 'data', &$xml = NULL, $addChild = 0) {
 		if (is_null($xml)) {
 			$xml = new SimpleXMLElement('<' . $rootNodeName . '/>');
 		}
-		
+
 		// loop through the data passed in.
 		foreach($data as $key => $value) {
 			// if numeric key, assume array of rootNodeName elements
@@ -910,7 +913,7 @@ class jifilehelper {
 			} else {
 				// delete any char not allowed in XML element names
 				$key = preg_replace('/[^a-z0-9\-\_\.\:]/i', '', $key);
-				
+
 				// if there is another array found recrusively call this function
 				if (is_array($value)) {
 					$valueChild = (isset($value['attributes']) && isset($value['@value'])) ? $value['@value'] : null;
@@ -929,11 +932,11 @@ class jifilehelper {
 		// pass back as string. or simple xml object if you want!
 		return $xml->asXML();
 	}
-	
+
 	static function isAssoc( $array ) {
     	return (is_array($array) && 0 !== count(array_diff_key($array, array_keys(array_keys($array)))));
 	}
-	
+
 	static function is_empty($value) {
 		if(!is_array($value)) $value = trim($value);
 		if($value !== 0 && $value !== '0' && empty($value)) {
@@ -941,7 +944,7 @@ class jifilehelper {
 		}
 		return true;
 	}
-	
+
 	static function array_filter_recursive($input)
 	{
 		foreach ($input as &$value)
@@ -951,53 +954,53 @@ class jifilehelper {
 				$value = jifilehelper::array_filter_recursive($value);
 			}
 		}
-		
+
 		return array_filter($input, array('jifilehelper', 'is_empty'));
 	}
 
 	static function JText($string, $jsSafe = false) {
-		
+
 		//{}|&~![()^':.;#/
 		$pattern = array('/\s/', '/(\{|\}|\||\&|\~|\!|\[|\(|\)|\^|\'|:|\.|;|#)/');
 		$replace = array('_', '');
 		$string = preg_replace($pattern, $replace, $string);
 		return JText::_($string, $jsSafe);
 	}
-	
+
 	static function getActions()
 	{
-		jimport('joomla.access.access');
-		$user	= JFactory::getUser();
-		$result	= new JObject;
-	
+		$user	= Factory::getUser();
+		$result	= new stdClass();
+
 		$assetName = 'com_jifile';
-	
-		$actions = JAccess::getActions('com_jifile', 'component');
-	
-		foreach ($actions as $action) {
-			$result->set($action->name, $user->authorise($action->name, $assetName));
-		}
-	
-		return $result;
+
+		$actions = ContentHelper::getActions('com_jifile', 'component');
+
+//		foreach ($actions as $action) {
+//			$name = $action->name;
+//			$result->$name = $user->authorise($action->name, $assetName);
+//		}
+
+		return $actions;
 	}
-	
+
 	static function checkVersion($install = 1) {
 		$host = parse_url( JURI::root( false ) );
 		$host = strtolower( $host['host'] );
-		
+
 		$jver = JVERSION;
 		$jifilever = JIFILEVER;
-		
+
 		$config = new JConfig();
-		
+
 		$key = md5($config->secret);
-		
+
 		$url = 'http://www.isapp.it/jifile/checkVer.php?host='.$host.'&jver='.$jver.'&key='.$key.'&jifilever='.$jifilever.'&install='.$install;
-		
+
 		$data = '';
 		if ( function_exists( 'curl_init' ) ) {
 			$curl_handle = curl_init();
-		
+
 			$options = array
 			(
 			CURLOPT_URL => $url,
@@ -1007,7 +1010,7 @@ class jifilehelper {
 			CURLOPT_USERAGENT => "some crazy browser"
 			);
 			@curl_setopt_array( $curl_handle,$options );
-		
+
 			$data = curl_exec( $curl_handle );
 			curl_close( $curl_handle );
 		} else {
@@ -1020,51 +1023,51 @@ class jifilehelper {
 				$data = implode( '', $data );
 			}
 		}
-		
+
 		return $data;
 	}
-	
+
 	/*
 	 * $addparams: array('server_bit'=>$server_bit)
 	 */
 	static function saveParams($addparams) {
-		
+
 		$table =& JTable::getInstance('extension');
 		$params = & JComponentHelper::getParams('com_jifile');
 		$params->loadArray($addparams);
-		
+
 		$row['extension_id'] = $table->find(array('element'=>'com_jifile'));
-		$row['params'] = $params->toArray(); 
-		
+		$row['params'] = $params->toArray();
+
 		$table->bind($row);
 		$table->store();
 	}
-	
+
 	static function getSysInfo() {
 		require_once(JPATH_SITE.'/administrator/components/com_admin/models/sysinfo.php');
 		require_once(JPATH_SITE.'/administrator/components/com_jifile/models/config.php');
 		require_once(JPATH_SITE.'/administrator/components/com_jifile/views/frontpage/view.html.php');
 		require_once(JPATH_SITE.'/administrator/components/com_jifile/tables/addon.php');
 		require_once(JPATH_IFILE_LIBRARY.'/ifile/IFileVersion.php');
-		
+
 		$arrayInfo = array();
-		
+
 		try {
 			$params = & JComponentHelper::getParams('com_jifile');
 			$arrayInfo['jiFileParams'] 	= $params->toArray();
 			$arrayInfo['jiFileParams']['jifile_ver'] = JIFILEVER;
-			
+
 			$jifileConfig = new JifileModelConfig();
 			$arrayInfo['ifileConfig'] = $jifileConfig->getConfig()->getConfig();
 			$arrayInfo['ifileConfig']['ifile_ver'] = IFileVersion::VERSION;
-			
+
 			//report Check
 			$reportCheckObj = new JifileViewFrontpage();
 			$reportCheck = array();
 			foreach($reportCheckObj->getReportCheck() as $caption => $check) {
 				$caption = strtolower($caption);
 				$reportCheck[$caption] = array();
-			
+
 				foreach($check as $key => $obj){
 					$reportCheck[$caption][$key]['check'] = $obj->getCheck();
 					$reportCheck[$caption][$key]['message'] = $obj->getMessage();
@@ -1072,90 +1075,90 @@ class jifilehelper {
 				}
 			}
 			$arrayInfo['reportCheck'] = $reportCheck;
-			
+
 			//addon
 			$addon = new JifileTableAddon(JFactory::getDBO());
 			$arrayInfo['addons'] = $addon->find(array(), '*', 'addon');
-			
+
 			//joomla
 			$sysinfo = new AdminModelSysInfo();
-			
+
 			$arrayInfo['info'] 		= $sysinfo->getInfo();
 			$arrayInfo['phpSet'] 	= $sysinfo->getPhpSettings();
 			//$arrayInfo['phpInfo'] 	= array('html' => $sysinfo->getPHPInfo());
-			
+
 			return json_encode($arrayInfo);
 		} catch (Exception $e) {
 			return $e;
 		}
 	}
-	
+
 	public static function encodingCharset($text) {
 		$params = JComponentHelper::getParams( 'com_jifile' );
 		$encoding_so = $params->get( 'encoding_so' );
-	
+
 		if (!empty($encoding_so) && strtolower($encoding_so) != strtolower(JFactory::getDocument()->getCharset())) {
 			$text = iconv($encoding_so, "UTF-8//TRANSLIT", $text);
 		}
-	
+
 		return $text;
 	}
-	
+
 	public static function getFirma() {
 		$firma = '<div id="firma"><a href="http://jifile.isapp.it" target="_blank">JiFile '.JIFILEVER.' - isApp.it</a></div>';
 		return $firma;
 	}
-	
+
 	public static function parseXMLInstallFile($path)
 	{
 		JLog::add('JApplicationHelper::parseXMLInstallFile is deprecated. Use JInstaller::parseXMLInstallFile instead.', JLog::WARNING, 'deprecated');
-	
+
 		// Read the file to see if it's a valid component XML file
 		if (!$xml = JFactory::getXML($path))
 		{
 			return false;
 		}
-	
+
 		// Check for a valid XML root tag.
-	
+
 		// Should be 'install', but for backward compatibility we will accept 'extension'.
 		// Languages use 'metafile' instead
-	
+
 		if ($xml->getName() != 'addon')
 		{
 			unset($xml);
 			return false;
 		}
-	
+
 		$data = array();
-	
+
 		$data['name'] = (string) $xml->name;
-	
+
 		// Check if we're a language. If so use metafile.
 		$data['type'] = $xml->getName() == 'metafile' ? 'language' : (string) $xml->attributes()->type;
-	
+
 		$data['creationDate'] = ((string) $xml->creationDate) ? (string) $xml->creationDate : JText::_('Unknown');
 		$data['author'] = ((string) $xml->author) ? (string) $xml->author : JText::_('Unknown');
-	
+
 		$data['copyright'] = (string) $xml->copyright;
 		$data['authorEmail'] = (string) $xml->authorEmail;
 		$data['authorUrl'] = (string) $xml->authorUrl;
 		$data['version'] = (string) $xml->version;
 		$data['description'] = (string) $xml->description;
-	
+
 		return $data;
 	}
-	
+
 	public static function isControllerAddon() {
-		
+
 		$addonPath = JIFILE_ADDON_PATH;
 		$basePath = JPATH_COMPONENT;
-		$format = JRequest::getWord('format');
-		$command = JRequest::getVar('task');
-		
+		$format = Factory::getApplication()->getRouter()->getVar('format');
+		$command = Factory::getApplication()->getRouter()->getVar('task');
+
 		// Check for array format.
 		$filter = JFilterInput::getInstance();
-		
+
 		if (is_array($command))
 		{
 			$command = $filter->clean(array_pop(array_keys($command)), 'cmd');
@@ -1164,36 +1167,36 @@ class jifilehelper {
 		{
 			$command = $filter->clean($command, 'cmd');
 		}
-		
+
 		// Check for a controller.task command.
 		if (strpos($command, '.') !== false)
 		{
 			// Explode the controller.task command.
 			list ($type, $task) = explode('.', $command);
-		
+
 			// Define the controller filename and path.
 			$file = jifilehelper::createFileName('controller', array('name' => $type, 'format' => $format));
 			$path = $basePath . '/controllers/' . $file;
-			
+
 			if (!file_exists($path)) {
 				$file = jifilehelper::createFileName('controller', array('name' => $type, 'format' => $format));
 				$path = $addonPath.'/'.$type.'/controllers/'.$file;
-				
+
 				if (file_exists($path)) {
 					return $type;
 				}
 			}
-		
+
 			// Reset the task without the controller context.
 			//JRequest::setVar('task', $task);
 		}
 		return false;
 	}
-	
+
 	public static function createFileName($type, $parts = array())
 	{
 		$filename = '';
-	
+
 		switch ($type)
 		{
 			case 'controller':
@@ -1212,23 +1215,23 @@ class jifilehelper {
 				{
 					$parts['format'] = '';
 				}
-	
+
 				$filename = strtolower($parts['name']) . $parts['format'] . '.php';
 				break;
-	
+
 			case 'view':
 				if (!empty($parts['type']))
 				{
 					$parts['type'] = '.' . $parts['type'];
 				}
-	
+
 				$filename = strtolower($parts['name']) . '/view' . $parts['type'] . '.php';
 				break;
 		}
-	
+
 		return $filename;
 	}
-	
+
 	/**
 	 * Get Lucene Plugins Instance
 	 * Return registry whit instance of Lucene Plugins
@@ -1236,9 +1239,9 @@ class jifilehelper {
 	 */
 	public static function getPluginLuceneInstance() {
 		$registry = array();
-		
+
 		require_once(JPATH_ADMINISTRATOR.'/components/com_jifile/helpers/interface/jifilepluginfactory.php');
-		
+
 		$filter = array();
 		$filter['context'] = array('type' => 's', 'value' => 'admin');
 		$filter['published'] = array('type' => 'i', 'value' => 1);
@@ -1248,22 +1251,22 @@ class jifilehelper {
 		$order['ordering'] = 'asc';
 		$tableAddon = JTable::getInstance('Addon', 'JifileTable');
 		$plugins = $tableAddon->getAddon($filter, $order);
-		$jifilefactory = JiFilePluginFactory::getInstance(); 
-		
-		
-		// create instance of the Lucene Plugins 
+		$jifilefactory = JiFilePluginFactory::getInstance();
+
+
+		// create instance of the Lucene Plugins
 		if (!empty($plugins)) {
-			
-			foreach ($plugins as $plugin) {				
+
+			foreach ($plugins as $plugin) {
 				//$registry[] =& $jifilefactory->getLucenePlugin($plugin);
 				$registry[] = $jifilefactory->getJifileAddon($plugin);
-			}	
-		} 
-		
+			}
+		}
+
 		return $registry;
-		
+
 	}
-	
+
 	/**
 	 * Add Languages from Addon
 	 * @return void
@@ -1271,44 +1274,44 @@ class jifilehelper {
 	public static function addLanguages() {
 		// set addons
 		$addons = array();
-		
-		// get all addon not core		
+
+		// get all addon not core
 		$filter['core'] = array('type' => 'i', 'value' => '0');
-		
+
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_jifile/tables/');
 		$tableAddon = JTable::getInstance('Addon', 'JifileTable');
 		$addons = $tableAddon->getAddon($filter);
-		
+
 		if (!empty($addons)) {
 			//load language addon
 			jimport('joomla.client.helper');
-			
+
 			$lang_codes = JLanguageHelper::getLanguages('lang_code');
 			if (isset($lang_codes[JFactory::getLanguage()->getTag()])) {
 				$lang_code 	= $lang_codes[JFactory::getLanguage()->getTag()]->lang_code;
 			} else {
 				$lang_code = 'en-GB';
 			}
-				
+
 			$lang = JFactory::getLanguage();
-			
+
 			foreach ($addons as $addon) {
-				
+
 				list($context, $name) = explode(".", $addon['addon']);
-				
+
 				if ($addon['context'] == 'plugin') {
 					$plugin = $addon['plugin'];
 					$basePath = JIFILE_ADDON_PLUGIN_PATH.'/'.$plugin.'/'.$name;
 					$filename = 'plg_jifile_'.$name;
 				} else {
 					$basePath = JIFILE_ADDON_PATH.'/'.$name;
-					$filename = 'addon_jifile_'.$name; 
+					$filename = 'addon_jifile_'.$name;
 				}
 				$lang->load($filename, $basePath, $lang_code);
-			}	
+			}
 		}
 	}
-	
+
 	public static function setDebug($state = 0) {
 		JFactory::getSession()->set('JIFILE_DEBUG', $state);
 	}

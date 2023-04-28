@@ -9,6 +9,8 @@
 //no direct access
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\CMS\Factory;
+
 require_once 'version.php';
 require_once JPATH_COMPONENT.'/helpers/jifilehelper.php';
 // Adapter for Joomla version
@@ -19,7 +21,7 @@ $jAdapter = AdapterForJoomlaVersion::getInstance();
 //define('JIFILE_ADDON_PLUGIN_PATH', JPATH_COMPONENT.'/addon/plugins');
 
 // Access check.
-if (!JFactory::getUser()->authorise('core.manage', 'com_jifile')) 
+if (!JFactory::getUser()->authorise('core.manage', 'com_jifile'))
 {
 	return JError::raiseWarning(404, JText::_('JERROR_ALERTNOAUTHOR'));
 }
@@ -48,7 +50,7 @@ if (($addon = jifilehelper::isControllerAddon()) !== FALSE) {
 $controller = JControllerLegacy::getInstance('Jifile', $config);
 
 // Perform the Request task
-$controller->execute(JFactory::getApplication()->input->get('task'));
- 
+$controller->execute(Factory::getApplication()->input->get('task'));
+
 // Redirect if set by the controller
 $controller->redirect();

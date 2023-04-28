@@ -123,7 +123,12 @@ class AdapterForJoomlaVersion {
 	public function getJoomlaVersion() {
 		
 		$versionFile = JPATH_LIBRARIES."/cms/version/version.php";
-		
+
+		// var_dump("VERSION PATH: ".$versionFile);
+
+		// default version
+        $this->_joomlaVersion = AdapterForJoomlaVersion::JOOMLA_3X;
+
 		if ($this->_joomlaVersion == null && file_exists($versionFile)) {
 			require_once ($versionFile);
 			// get JVersion object
