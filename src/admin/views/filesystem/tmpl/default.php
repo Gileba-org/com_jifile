@@ -173,4 +173,3 @@ if(isset($this->error_pref)) {
 <?php } //nessun index path configurato
 	echo $this->loadTemplate('indexesmodal');
 ?>
-<?php echo jifilehelper::getFirma(); ?>

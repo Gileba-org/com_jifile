@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
 * @subpackage	com_jifile
 * @author		Antonio Di Girolamo & Giampaolo Losito
@@ -6,14 +6,14 @@
 * @license		http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
 * @link		http://jifile.isapp.it
 */
-defined('_JEXEC') or die('Restricted access'); 
+defined('_JEXEC') or die('Restricted access');
 
 if(isset($this->errors)) {
 	?>
 	<div>
 	<?php echo JText::_('THE_FOLLOWING_ERRORS_HAVE_OCCURRED').': <br/><br/>'.implode('<br/>', $this->errors) ?>
 	</div>
-	<?php 
+	<?php
 }
 ?>
 
@@ -35,15 +35,15 @@ if(isset($this->errors)) {
 		</td>
 	</tr>
 <?php
-// Non necessaria in questa versione. 
-/* 
+// Non necessaria in questa versione.
+/*
 	<tr>
 		<td width="110"><label for="table-name"><?php echo JText::_( 'Table-name' ); ?></label></td>
 		<td>
 			<input class="inputbox" type="text" name="xml[table-name]" id="table-name" value="<?php echo $this->xmlValue['table-name'] ?>" size="50" maxlength="255">
 		</td>
 	</tr>
-*/ 
+*/
 ?>
 	<tr>
 		<td width="110"><label for="timelimit"><?php echo JText::_( 'Timelimit' ); ?></label></td>
@@ -59,15 +59,15 @@ if(isset($this->errors)) {
 				<span class="add-on">Mb</span>
 			</div>
 		</td>
-	</tr>			
+	</tr>
 	<tr>
 		<td width="110"><label for="xmlencoding"><?php echo JText::_( 'Encoding' ); ?></label></td>
 		<td>
 			<?php echo $this->xmlValue['encoding'] ?>
 			<span style="font-size: 10px; font-style: italic; padding-left: 25px;">(<?php echo JText::_('ENCODING_RECOMMENDED') ?>)</span>
 		</td>
-	</tr>	
-	<tr>	
+	</tr>
+	<tr>
 		<td width="110"><label for="server_bit"><?php echo JText::_( 'Server bit' ); ?></label></td>
 		<td>
 			<?php echo $this->xmlValue['serverBit'] ?>
@@ -92,21 +92,21 @@ if(isset($this->errors)) {
 			<br /><span style="font-size: 10px; font-style: italic; padding-left: 25px;"><?php echo JText::_( 'INFO_DOCTOTEXT' ); ?></span>
 		</td>
 	</tr>
-	
+
 	<tr><td colspan="2">&nbsp;</td></tr>
-	
+
 	<tr>
 		<th colspan="2"><?php echo JText::_( 'XPDF' ); ?> (<a href="javascript:void(0)" id="openXPDF"><?php echo JText::_( 'Open' ); ?></a>)</th>
-	</tr>	
+	</tr>
 	<tr>
 		<td colspan="2">
 			<div id="xpdf-section" style="display: none">
-			<table class="adminform table table-striped">				
+			<table class="adminform table table-striped">
 				<tr>
-					<td colspan="2">			
+					<td colspan="2">
 						<label for="table-name"><a id="xpdfrcfile" href="index.php?option=com_jifile&task=config.xpdfrc&view=xpdfrc&tmpl=component"><?php echo JText::_( 'JIFILE_EDIT_XPDFRC' ); ?></a></label>
-						<span style="font-size: 10px; font-style: italic; padding-left: 25px;"><?php echo JText::_( 'JIFILE_INFO_EDIT_XPDFRC' ); ?></span>			
-					</td>		
+						<span style="font-size: 10px; font-style: italic; padding-left: 25px;"><?php echo JText::_( 'JIFILE_INFO_EDIT_XPDFRC' ); ?></span>
+					</td>
 				</tr>
 			</table>
 			<table class="adminform table table-striped">
@@ -154,11 +154,11 @@ if(isset($this->errors)) {
 						<br /><span style="font-size: 10px; font-style: italic; padding-left: 25px;"><?php echo JText::_( 'JIFILE_INFO_XPDFRC_PDFINFO' ); ?></span>
 					</td>
 				</tr>
-			</table>	
-			</div>	
+			</table>
+			</div>
 		</td>
 	</tr>
-		
+
 	<tr>
 		<th colspan="2"><?php echo JText::_( 'Fileds' ); ?>: (<a href="javascript:void(0)" id="openField"><?php echo JText::_( 'Open' ); ?></a>)</th>
 	</tr>
@@ -172,7 +172,7 @@ if(isset($this->errors)) {
 		<th>Encoding <span style="font-weight: normal; font-style: italic;">(default <span id="default_encoding"><?php echo $this->xmlValue['encoding'] ?></span>)</span></th>
 		*/ ?>
 	</tr>
-	<?php 
+	<?php
 		$i = 0;
 		foreach ($this->xmlValue['zend-document'] as $key => $field) { ?>
 	<tr class="<?php echo 'row'.($i%2); $i++; ?>">
@@ -239,7 +239,7 @@ if(isset($this->errors)) {
 	<?php } ?>
 	</table>
 	</div>
-	</td></tr>	
+	</td></tr>
 	<tr>
 		<th colspan="2"><?php echo JText::_( 'Analyzer' ); ?>:</th>
 	</tr>
@@ -280,7 +280,7 @@ if(isset($this->errors)) {
 		<td class="rientro3" width="60">&nbsp;</td>
 		<td>
 			<div id="filters">
-			<?php 
+			<?php
 				if(!empty($this->xmlValue['filters'])) {
 					foreach ($this->xmlValue['filters'] as $key => $filter) {
 						$i = $key+1;
@@ -293,7 +293,7 @@ if(isset($this->errors)) {
 						<label style="padding: 0 17px" for="class<?php echo $key ?>"><?php echo JText::_( 'Class' ); ?></label>
 						<input class="inputbox" type="text" name="xml[analyzer][filters][custom-filters][filter][<?php echo $key ?>][attributes][class]" id="class<?php echo $key ?>" value="<?php echo $class ?>" size="50" maxlength="255" />
 						</p>
-						<?php 
+						<?php
 					}
 				}
 			?>
@@ -304,7 +304,6 @@ if(isset($this->errors)) {
 <input type="hidden" name="task" value="" />
 <?php echo JHtml::_('form.token'); ?>
 </form>
-<?php echo jifilehelper::getFirma(); ?>
 <script type="text/javascript">
 	jQuery('#openField').click(function(){
 		jQuery('#zend-document').slideToggle('slow', function() {
@@ -315,7 +314,7 @@ if(isset($this->errors)) {
 				}
 			});
 	});
-	
+
 	jQuery('#openXPDF').click(function(){
 		jQuery('#xpdf-section').slideToggle('slow', function() {
 				if(jQuery('#xpdf-section').css('display') == 'block') {

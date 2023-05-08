@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
 * @subpackage	com_jifile
 * @author		Antonio Di Girolamo & Giampaolo Losito
@@ -11,7 +11,7 @@ defined('_JEXEC') or die('Restricted access');
 if(isset($this->error_pref)) {
 	echo $this->error_pref;
 } else {
-?>  
+?>
 <script type="text/javascript">
 window.addEvent('domready', function() {
 	$$('#ifile tr').addEvent('click',function(event) {
@@ -27,29 +27,29 @@ function submitbutton(pressbutton) {
 	submitform(pressbutton);
 }
 function resetForm(dom, elem) {
-	
+
 	jQuery('input[name=filter_order]').val('');
 	jQuery('input[name=filter_order_Dir]').val('');
 	jQuery('input[name=invioform]').val('1');
 	if(elem == 'order') {
 		return;
 	}
-	
+
 	jQuery('#search').val('');
-	<?php 
+	<?php
 		foreach ($this->pluginLucene as $plugin) {
 			$getFiltersName = $plugin->getFiltersName();
-			
+
 			if (!empty($getFiltersName) && is_array($getFiltersName)) {
 				foreach ($getFiltersName as $filtername) {
-					echo "jQuery('#{$filtername}').val('');";	
+					echo "jQuery('#{$filtername}').val('');";
 				}
 			}
 		}
 	?>
 	jQuery('#filter_field').val('');
 	jQuery('#filter_searchphrases').val('');
-	
+
 	jQuery('#adminForm').submit();
 }
 </script>
@@ -66,9 +66,9 @@ echo 'Report '.JText::_('index').':';
 	<li><?php echo JText::_('TOTAL_FILES_INCLUDED').': <span class="badge badge-info">'.$this->count.'</span>'; ?></li>
 	<li><?php echo JText::_('TOTAL_FILES_INDEXED').': <span class="badge badge-info">'.$this->numDocs.'</span>'; ?></li>
 	<li><?php echo JText::_('TOTAL_DELETED_FILES').': <span class="badge badge-info">'.$this->numDelete.'</span>'; ?></li>
-	<li><?php 
+	<li><?php
 			$optimize = ($this->optimize) ? '<span class="ok label label-success">'.JText::_( 'NOT_NECESSARY' ).'</span>' : '<span class="nook label label-warning">'.JText::_( 'Necessary' ).'</span>';
-			echo JText::_('Optimization').': '.$optimize; 
+			echo JText::_('Optimization').': '.$optimize;
 		?>
 	</li>
 </ul>
@@ -92,7 +92,7 @@ echo 'Report '.JText::_('index').':';
 				<td align="right">
 					<table>
 						<tr style="width:100%;float:right;">
-							
+
 							<?php foreach ($this->pluginLucene as $plugin) { ?>
 								<td>
 									<?php $plugin->printFilter() ?>
@@ -104,7 +104,7 @@ echo 'Report '.JText::_('index').':';
 			<?php else : ?>
 				<td width="50%">&nbsp;</td>
 			<?php endif ?>
-			<?php 
+			<?php
 			/*
 			<td width="2%">
 				<div class="btn-group">
@@ -113,9 +113,9 @@ echo 'Report '.JText::_('index').':';
 				</div>
 			</td>
 			*/
-			?>		
+			?>
 		</tr>
-		
+
 	</table>
 	<table>
 		<tr>
@@ -127,8 +127,8 @@ echo 'Report '.JText::_('index').':';
 			</td>
 		</tr>
 	</table>
-	
-	
+
+
 <?php if (!empty($this->lucene)) : ?>
 	<table id="ifile" class="adminlist table table-hover table-striped">
 		<thead>
@@ -139,7 +139,7 @@ echo 'Report '.JText::_('index').':';
 				<th width="2%">Id</th>
 				<?php if(!empty($this->listFilter['search'])) { $totFields++; ?>
 					<th width="2%">score</th>
-				<?php 
+				<?php
 				}
 					foreach ($this->fieldView as $fieldname) {
 						if(empty($this->listFilter['search'])) {
@@ -161,12 +161,12 @@ echo 'Report '.JText::_('index').':';
 			</tr>
 		</tfoot>
 		<tbody>
-		<?php 
+		<?php
 		$i = 0;
-		foreach ($this->lucene as $key => $doc) : 
+		foreach ($this->lucene as $key => $doc) :
 
 				$keyId = $doc['doc']->getFieldValue("key");
-		
+
 				if (array_key_exists($keyId, $this->luceneFilters)) {
 					//$i++;
 					continue;
@@ -182,15 +182,15 @@ echo 'Report '.JText::_('index').':';
 						<?php } ?>
 						</td>
 						<td style="text-align:center"><?php echo $key ?></td>
-						<?php if(isset($doc['score'])) { 
+						<?php if(isset($doc['score'])) {
 							$bgScore = 100-($doc['score']*100);
 							$color = ($bgScore>65) ? '#000000' : '#FFFFFF';
 						?>
 						<td style="background-color: hsl(0, 0%, <?php echo $bgScore ?>%); color: <?php echo $color ?>"><?php echo $doc['score']; ?></td>
-						<?php } ?>						
+						<?php } ?>
 				<?php foreach ($this->fieldView as $fieldname) { ?>
 					<td>
-					<?php 
+					<?php
 						try {
 							if($fieldname == 'name') {
 								$filename = jifilehelper::getCorrectFilename($doc['doc']->getFieldValue('path'));
@@ -215,7 +215,7 @@ echo 'Report '.JText::_('index').':';
 						}
 					?>
 					</td>
-			<?php 
+			<?php
 				} // close foreach
 			?>
 					<td style="text-align:center">
@@ -234,18 +234,18 @@ echo 'Report '.JText::_('index').':';
 								foreach ($this->pluginLucene as $plugin) {
 									$plugin->printAction($key, $doc);
 									echo '&nbsp;&nbsp;&nbsp;';
-								} 
+								}
 							?>
 						</td>
 					<?php endif ?>
 
-				</tr>				
-		<?php endforeach; ?>		
+				</tr>
+		<?php endforeach; ?>
 		</tbody>
 	</table>
-	
-	
-	
+
+
+
 <?php elseif(!empty($this->listFilter['search'])) : ?>
 	<?php echo JText::_( 'NO_FILES' ); ?>
 <?php endif; ?>
@@ -257,4 +257,3 @@ echo 'Report '.JText::_('index').':';
 	<?php echo JHTML::_( 'form.token' ); ?>
 </form>
 <?php } //nessun path configurato ?>
-<?php echo jifilehelper::getFirma(); ?>

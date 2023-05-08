@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
 * @subpackage	com_jifile
 * @author		Antonio Di Girolamo & Giampaolo Losito
@@ -6,7 +6,7 @@
 * @license		http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
 * @link		http://jifile.isapp.it
 */
-defined('_JEXEC') or die('Restricted access'); 
+defined('_JEXEC') or die('Restricted access');
 ?>
 
 <script type="text/javascript">
@@ -39,4 +39,3 @@ defined('_JEXEC') or die('Restricted access');
 <div class="clr"></div>
 <?php echo $this->loadTemplate('addonlist'); ?>
 <div class="clr"></div>
-<?php echo jifilehelper::getFirma(); ?>
