@@ -9,9 +9,11 @@
 
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Table\Table;
+
 require_once(JPATH_ADMINISTRATOR.'/components/com_jifile/models/lucene.php');
 // @TODO
-// da creare una propria classe dato che Joomla! 
+// da creare una propria classe dato che Joomla!
 // eliminerà le componenti nelle prossime versioni
 require_once JPATH_ADMINISTRATOR . '/components/com_search/helpers/search.php';
 
@@ -52,7 +54,7 @@ class JifileViewSearch extends JViewLegacy
 		}
 
 		$title = $params->get('page_title');
-		
+
 		if ($app->getCfg('sitename_pagetitles', 0) == 1) {
 			$title = JText::sprintf('JPAGETITLE', $app->getCfg('sitename'), $title);
 		}
@@ -77,9 +79,9 @@ class JifileViewSearch extends JViewLegacy
 		}
 
 		// @TODO
-		// si dovrebbe pensare ad un metodo per ordinare alcuni field dell'indice 
+		// si dovrebbe pensare ad un metodo per ordinare alcuni field dell'indice
 		// solo per quelli più significativi
-		// si può pensare a 
+		// si può pensare a
 		// built select lists
 		/*$orders = array();
 		$orders[] = JHtml::_('select.option',  'newest', JText::_('COM_SEARCH_NEWEST_FIRST'));
@@ -99,7 +101,7 @@ class JifileViewSearch extends JViewLegacy
 		$lists['searchphrase' ]= JHtml::_('select.radiolist',  $searchphrases, 'searchphrase', '', 'value', 'text', $state->get('match'));
 
 		// log the search
-		// @TODO 
+		// @TODO
 		// creazione di un sistema di LOG delle ricerche come per per la search see:
 		//SearchHelper::logSearch($searchword);
 
@@ -121,46 +123,46 @@ class JifileViewSearch extends JViewLegacy
 			//$error = JText::_('COM_SEARCH_ERROR_ENTERKEYWORD');
 		}
 		*/
-		
+
 		$model = JModelLegacy::getInstance('JifileModelLucene');
 		// setta la parola da ricercare nello state
 		$state->set('keyword', $searchword);
 		if ($error == null) {
-			
+
 			// pagination start end limit
 			$limitstart = $app->getUserStateFromRequest( $option.'limitstart_lucene', 'limitstart', 0, 'number' );
 			$limit 		= $app->getUserStateFromRequest( $option.'limit_lucene', 'limit', 10, 'number' );
 			$tot = 0;
-			
+
 			$lucene = null;
 			//gestione ricerca
 			if(!empty($searchword)) {
-				
+
 				$filterField = $filter_order = $filter_order_Dir = null;
 				$luceneSearch = $model->search($searchword, $filterField, $state->get('match'), $filter_order, $filter_order_Dir);
 				$luceneSearch = $this->getDocuments($luceneSearch);
-				
+
 				$tot = count($luceneSearch);
-				
+
 				if($limit != 0) {
 					$lucene = array_slice($luceneSearch, $limitstart, $limit, true);
 				} else {
 					$lucene = $luceneSearch;
 				}
-					
+
 				unset($luceneSearch);
 			}
-			
+
 			jimport('joomla.html.pagination');
 			$pageNav = new JPagination($tot, $limitstart, $limit);
-			
+
 			$results	= $lucene;
 			$total		= $tot;
 			$pagination	= $pageNav;
 
-			require_once JPATH_SITE . '/components/com_content/helpers/route.php';			
+			require_once JPATH_SITE . '/components/com_content/helpers/route.php';
 		}
-		
+
 
 		// Check for layout override
 		$active = JFactory::getApplication()->getMenu()->getActive();
@@ -185,23 +187,23 @@ class JifileViewSearch extends JViewLegacy
 		$this->total = $total;
 		$this->error = $error;
 		$this->action = $uri;
-		
+
 		$this->setDocument();
 
 		parent::display($tpl);
 	}
-	
+
 	/**
 	 * Return the text with highlight
-	 * 
+	 *
 	 * @param object $row
 	 * @param string $serachword
 	 * @param object $state
-	 * 
+	 *
 	 * @return object
 	 */
 	function highlightText($row, $searchword, $state) {
-		
+
 		// se è settato esatto
 		if ($state->get('match') == 'exact') {
 			$searchwords = array($searchword);
@@ -212,12 +214,12 @@ class JifileViewSearch extends JViewLegacy
 			$searchwords = preg_split("/\s+/u", $searchworda);
 			$needle = $searchwords[0];
 		}
-		
+
 		$row = SearchHelper::prepareSearchContent($row, $needle);
 		$searchwords = array_unique($searchwords);
 		$searchRegex = '#(';
 		$x = 0;
-		
+
 		foreach ($searchwords as $k => $hlword)
 		{
 			$searchRegex .= ($x == 0 ? '' : '|');
@@ -225,9 +227,9 @@ class JifileViewSearch extends JViewLegacy
 			$x++;
 		}
 		$searchRegex .= ')#iu';
-		
+
 		$row = preg_replace($searchRegex, '<span class="highlight">\0</span>', $row);
-		
+
 		/*
 		$result = &$results[$i];
 		if ($result->created) {
@@ -236,23 +238,23 @@ class JifileViewSearch extends JViewLegacy
 		else {
 			$created = '';
 		}
-		
+
 			$result->text		= JHtml::_('content.prepare', $result->text, '', 'com_jifile.search');
 			$result->created	= $created;
 			$result->count		= $i + 1;
 		}
 		*/
-		
+
 		return $row;
-		
-	} 
-	
+
+	}
+
 	function getDocuments($lucene) {
 		$result = array();
 		if(empty($lucene)) {
 			return $result;
 		}
-		
+
 		// get JiFile Plugin Add-on Search
 		$plugins = $this->getSearchPluginInstance();
 		// initilize array filter
@@ -263,26 +265,26 @@ class JifileViewSearch extends JViewLegacy
 				$arrayFilter = $arrayFilter + $plugin->onContentSearch();
 			}
 		}
-	
+
 		foreach ($lucene as $hit) {
-			
+
 			$doc = $hit->getDocument();
 			// get key form document
 			$key = $doc->getFieldValue('key');
-			
+
 			if (!empty($arrayFilter)) {
 				if (array_key_exists($key, $arrayFilter)) {
 					continue;
 				}
 			}
-			
+
 			$result[$hit->id]['score'] = $hit->score;
 			$result[$hit->id]['doc'] = $doc;
 			//$result[$hit->id]['doc'] = jifilehelper::luceneDocToArray($doc, false);
 		}
 		return $result;
 	}
-	
+
 	/**
 	 * Get Plugins Instance
 	 * Return registry whit instance of Lucene Plugins
@@ -290,9 +292,9 @@ class JifileViewSearch extends JViewLegacy
 	 */
 	public function getSearchPluginInstance() {
 		$registry = array();
-	
+
 		require_once(JPATH_ADMINISTRATOR.'/components/com_jifile/helpers/interface/jifilepluginfactory.php');
-	
+
 		$filter = array();
 		$filter['context'] = array('type' => 's', 'value' => 'plugin');
 		$filter['published'] = array('type' => 'i', 'value' => 1);
@@ -300,11 +302,11 @@ class JifileViewSearch extends JViewLegacy
 		$filter['plugin'] = array('type' => 's', 'value' => 'search');
 		$order = array();
 		$order['ordering'] = 'asc';
-		JTable::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_jifile/tables');
-		$tableAddon = JTable::getInstance('Addon', 'JifileTable');
+		Table::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_jifile/tables');
+		$tableAddon = Table::getInstance('Addon', 'JifileTable');
 		$plugins = $tableAddon->getAddon($filter, $order);
 		$jifilefactory = JiFilePluginFactory::getInstance();
-	
+
 		// create instance of the Search Plugins
 		if (!empty($plugins)) {
 			foreach ($plugins as $plugin) {
@@ -312,10 +314,10 @@ class JifileViewSearch extends JViewLegacy
 				$registry[] =& $jifilefactory->getJifileAddon($plugin);
 			}
 		}
-	
+
 		return $registry;
 	}
-	
+
 	function setDocument() {
 		$doc = JFactory::getDocument();
 		$doc->addStyleSheet( 'components/com_jifile/css/style.css?'.JIFILEVER );

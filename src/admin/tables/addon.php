@@ -10,11 +10,13 @@
 // No direct access
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Table\Table;
+
 /**
  * @package		administrator
  * @subpackage	com_jifile
  */
-class JifileTableAddon extends JTable
+class JifileTableAddon extends Table
 {
 	/**
 	 * Constructor
@@ -39,60 +41,60 @@ class JifileTableAddon extends JTable
 	{
 		return parent::bind($array, $ignore);
 	}
-	
+
 	/**
 	 * Return list of Addon for Admin Frontend
-	 * @param array $filters [optional] 
-	 * @param array $ordering [optional] 
-	 * @param int $offset [optional] 
-	 * @param int $limit [optional] 
+	 * @param array $filters [optional]
+	 * @param array $ordering [optional]
+	 * @param int $offset [optional]
+	 * @param int $limit [optional]
 	 * @return array
-	 */	
+	 */
 	public function getAddon($filters = array(), $ordering = array(), $offset = 0, $limit = 0) {
 		// Create a new query object.
 		$db		= $this->getDbo();
-		$query	= $db->getQuery(true);	
+		$query	= $db->getQuery(true);
 		$query->select('*');
 		$query->from('#__jifileaddon AS a');
-		
+
 		if (!empty($filters) && is_array($filters)) {
 			foreach ($filters as $field => $value) {
-				$operation = (empty($value['operation'])) ? "=" : $value['operation']; 
-				
+				$operation = (empty($value['operation'])) ? "=" : $value['operation'];
+
 				// set field integer
 				if ($value['type'] == "i") {
-					$query->where("a.{$field} {$operation} ".(int) $value['value']);	
-				} 
+					$query->where("a.{$field} {$operation} ".(int) $value['value']);
+				}
 				// set field string
 				if ($value['type'] == "s") {
 					$valueString = $db->quote((string) $value['value'], true);
-					$query->where("a.{$field} {$operation} ". $valueString ."");	
-				} 
+					$query->where("a.{$field} {$operation} ". $valueString ."");
+				}
 				// set field float
 				if ($value['type'] == "f") {
-					$query->where("a.{$field} {$operation} ".(float) $value['value']);	
-				}		
+					$query->where("a.{$field} {$operation} ".(float) $value['value']);
+				}
 			}
 		}
-		
+
 		if (!empty($ordering) && is_array($ordering)) {
 			foreach ($ordering as $field => $type) {
-				$query->order($db->escape($field.' '.$type));	
+				$query->order($db->escape($field.' '.$type));
 			}
 		}
-		
-		// Get the content 
+
+		// Get the content
 		$db->setQuery($query, $offset, $limit);
 		$rows = $db->loadAssocList();
-		
-		return $rows; 
+
+		return $rows;
 	}
-	
+
 	public function find($wheres = array(), $selects = '*', $keyReturn = '')
 	{
 		// Get the JDatabaseQuery object
 		$query = $this->_db->getQuery(true);
-		
+
 		foreach ($wheres as $col => $val)
 		{
 			$query->where($col . ' = ' . $this->_db->quote($val));
@@ -113,7 +115,7 @@ class JifileTableAddon extends JTable
 	 * @since	1.6
 	 */
 	public function store($updateNulls = false)
-	{	
+	{
 		// Attempt to store the data.
 		return parent::store($updateNulls);
 	}
@@ -122,7 +124,7 @@ class JifileTableAddon extends JTable
 	 * Overloaded check function
 	 *
 	 * @return boolean
-	 * @see JTable::check
+	 * @see Table::check
 	 * @since 1.5
 	 */
 	function check()

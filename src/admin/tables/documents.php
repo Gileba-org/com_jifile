@@ -10,11 +10,13 @@
 // No direct access
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Table\Table;
+
 /**
  * @package		administrator
  * @subpackage	com_jifile
  */
-class JifileTableDocuments extends JTable
+class JifileTableDocuments extends Table
 {
 	/**
 	 * Constructor
@@ -39,20 +41,20 @@ class JifileTableDocuments extends JTable
 	{
 		return parent::bind($array, $ignore);
 	}
-	
+
 	/**
 	 * Return all document
 	 * @param array $wheres [optional]
 	 * @param string $selects [optional]
 	 * @param string $keyReturn [optional]
-	 * @return 
+	 * @return
 	 */
 	public function find($wheres = array(), $selects = '*', $keyReturn = 'keyid')
 	{
 		if (!($wheres instanceof JDatabaseQueryMySQLi)) {
 			// Get the JDatabaseQuery object
 			$query = $this->_db->getQuery(true);
-			
+
 			foreach ($wheres as $col => $val)
 			{
 				$cond = '=';
@@ -65,7 +67,7 @@ class JifileTableDocuments extends JTable
 		} else {
 			$query = $wheres;
 		}
-	
+
 		$query->select($selects);
 		$query->from($this->_db->quoteName($this->getTableName()));
 		//die(var_dump($query->__toString()));
@@ -81,7 +83,7 @@ class JifileTableDocuments extends JTable
 	 * @since	1.6
 	 */
 	public function store($updateNulls = false)
-	{	
+	{
 		// Attempt to store the data.
 		return parent::store($updateNulls);
 	}
@@ -90,95 +92,95 @@ class JifileTableDocuments extends JTable
 	 * Overloaded check function
 	 *
 	 * @return boolean
-	 * @see JTable::check
+	 * @see Table::check
 	 * @since 1.5
 	 */
 	function check()
 	{
 		return true;
 	}
-	
+
 	/**
 	 * Insert keyid in table if not exists
-	 * @param string $keyid 
+	 * @param string $keyid
 	 * @return bool
-	 */	
+	 */
 	public function insertDocuments($keyid, $delete = 0) {
 		// Create a new query object.
 		$db		= $this->getDbo();
-		
-		$table = $db->quoteName($this->getTableName());		
+
+		$table = $db->quoteName($this->getTableName());
 		$keyid = $db->quote($keyid);
-		
+
 		$query = "INSERT INTO {$table} (keyid, {$db->quoteName('delete')})
 					SELECT {$keyid}, {$delete} FROM dual
 					WHERE NOT EXISTS (
 					    SELECT keyid FROM {$table} WHERE keyid = {$keyid}
 					) LIMIT 1";
-		$db->setQuery($query);			
-		
+		$db->setQuery($query);
+
 		$db->query();
 		if ($db->getErrorNum())
 		{
 			echo JText::sprintf('JLIB_DATABASE_ERROR_FUNCTION_FAILED', $db->getErrorNum(), $db->getErrorMsg()).'<br />';
 			return false;
-		}	
-		
+		}
+
 		return true;
 	}
-	
+
 	/**
 	 * Update delete fields in table
-	 * @param string $keyid 
+	 * @param string $keyid
 	 * @return bool
-	 */	
+	 */
 	public function updateDocument($setFields, $filters = false ) {
 		// Create a new query object.
 		$db		= $this->getDbo();
 		$query  = $this->_db->getQuery(true);
-		
+
 		$table = $db->quoteName($this->getTableName());
 		$query->update($table);
-		
+
 		if (!empty($setFields) && is_array($setFields)) {
 			foreach ($setFields as $field => $value) {
 				$setField = "";
 				$valueSetField = $this->setTypeField($value['value'], $value['type']);
 				$setField = $db->quoteName($field) ." = ".$valueSetField;
-				$query->set($setField);						
+				$query->set($setField);
 			}
 		} else {
 			$e =  new JException(JText::sprintf('JLIB_DATABASE_ERROR_FUNCTION_FAILED', get_class($this), "Update Params Not Found"));
 			$this->setError($e);
 			return false;
 		}
-		
+
 		if (!empty($filters) && is_array($filters)) {
 			foreach ($filters as $field => $value) {
-				
-				$operation = (empty($value['operation'])) ? "=" : $value['operation'];				
-				
+
+				$operation = (empty($value['operation'])) ? "=" : $value['operation'];
+
 				$fieldValue = $this->setTypeField($value['value'], $value['type']);
-				
+
 				if (!is_array($value['value'])) {
-					$query->where("{$field} {$operation} {$fieldValue}");	
+					$query->where("{$field} {$operation} {$fieldValue}");
 				} else {
 					$where = (empty($value['where'])) ? " AND " : $value['where'];
 					switch ($operation) {
 						case 'in':
 							$fieldValue = "(".implode(",", $fieldValue).")";
-							$query->where("{$field} {$operation} {$fieldValue}");	
+							$query->where("{$field} {$operation} {$fieldValue}");
 						break;
-						default:							
+						default:
 							$fieldValue = $field . " {$operation} "  . implode( " {$where} " . $field . " {$operation} ", $fieldValue);
 							$query->where($fieldValue);
 						break;
 					}
 				}
 			}
-		}				
+		}
 		// set query
-		$db->setQuery($query);			
+		$db->setQuery($query);
 		// execute query
 		$db->query();
 		// get error
@@ -186,135 +188,135 @@ class JifileTableDocuments extends JTable
 		{
 			$e = new JException(JText::sprintf('JLIB_DATABASE_ERROR_FUNCTION_FAILED', get_class($this), $this->_db->getErrorMsg()));
 			$this->setError($e);
-			return false;						
-		}	
-		
+			return false;
+		}
+
 		return true;
 	}
-	
+
 	function setTypeField($values, $type) {
 		// Create a new query object.
 		$db		= $this->getDbo();
-		
+
 		if (!is_array($values)) {
 			$fieldValue = "";
 			// set field integer
 			if ($type == "i") {
-				$fieldValue = (int) $values;	
-			} 
+				$fieldValue = (int) $values;
+			}
 			// set field string
 			if ($type == "s") {
 				$fieldValue = $db->quote((string) $values, true);
-			} 
+			}
 			// set field float
 			if ($type == "f") {
-				$fieldValue = (float) $values;	
-			}	
+				$fieldValue = (float) $values;
+			}
 		} else {
 			$fieldValue = array();
 			foreach ($values as $value) {
 				$fieldValue[] = $this->setTypeField($value, $type);
-			} 	
+			}
 		}
-		
-		return $fieldValue;	
+
+		return $fieldValue;
 	}
-	
+
 	/**
 	 * Update delete fields in table
-	 * @param string $keyid 
+	 * @param string $keyid
 	 * @return bool
-	 */	
+	 */
 	public function updateDeleteDocuments($keyid) {
 		// Create a new query object.
 		$db		= $this->getDbo();
-		
-		$table = $db->quoteName($this->getTableName());	
-		$fieldDelete = $db->quoteName('delete');	
+
+		$table = $db->quoteName($this->getTableName());
+		$fieldDelete = $db->quoteName('delete');
 		$keyid = $db->quote($keyid);
-		
+
 		$query = "UPDATE {$table} SET {$fieldDelete} = 1 WHERE keyid = {$keyid} LIMIT 1";
-		$db->setQuery($query);			
-		
+		$db->setQuery($query);
+
 		$db->query();
 		if ($db->getErrorNum())
 		{
 			echo JText::sprintf('JLIB_DATABASE_ERROR_FUNCTION_FAILED', $db->getErrorNum(), $db->getErrorMsg()).'<br />';
 			return false;
-		}	
-		
+		}
+
 		return true;
 	}
-	
+
 	/**
 	 * Update Delete AllDocument in table
-	 * @param string  
+	 * @param string
 	 * @return bool
-	 */	
+	 */
 	public function updateDeleteAllDocuments() {
 		// Create a new query object.
 		$db		= $this->getDbo();
-		
-		$table = $db->quoteName($this->getTableName());	
+
+		$table = $db->quoteName($this->getTableName());
 		$query = "UPDATE {$table} SET {$fieldDelete} = 1 ";
-		$db->setQuery($query);			
-		
+		$db->setQuery($query);
+
 		$db->query();
 		if ($db->getErrorNum())
 		{
 			echo JText::sprintf('JLIB_DATABASE_ERROR_FUNCTION_FAILED', $db->getErrorNum(), $db->getErrorMsg()).'<br />';
 			return false;
-		}	
-		
+		}
+
 		return true;
 	}
-	
+
 	/**
 	 * Delete AllDocument in table
-	 * @param string  
+	 * @param string
 	 * @return bool
-	 */	
+	 */
 	public function deleteAllDocuments() {
 		// Create a new query object.
 		$db		= $this->getDbo();
-		
-		$table = $db->quoteName($this->getTableName());	
-		$fieldDelete = $db->quoteName('delete');	
-		
+
+		$table = $db->quoteName($this->getTableName());
+		$fieldDelete = $db->quoteName('delete');
+
 		$query = "DELETE FROM {$table} WHERE {$fieldDelete} = 1";
-		$db->setQuery($query);			
-		
+		$db->setQuery($query);
+
 		$db->query();
 		if ($db->getErrorNum())
 		{
 			echo JText::sprintf('JLIB_DATABASE_ERROR_FUNCTION_FAILED', $db->getErrorNum(), $db->getErrorMsg()).'<br />';
 			return false;
-		}	
-		
+		}
+
 		return true;
 	}
-	
+
 	/**
 	 * Truncate table
-	 * @param string  
+	 * @param string
 	 * @return bool
-	 */	
+	 */
 	public function truncateDocuments() {
 		// Create a new query object.
 		$db		= $this->getDbo();
-		
-		$table = $db->quoteName($this->getTableName());	
+
+		$table = $db->quoteName($this->getTableName());
 		$query = "TRUNCATE TABLE {$table}";
-		$db->setQuery($query);			
-		
+		$db->setQuery($query);
+
 		$db->query();
 		if ($db->getErrorNum())
 		{
 			echo JText::sprintf('JLIB_DATABASE_ERROR_FUNCTION_FAILED', $db->getErrorNum(), $db->getErrorMsg()).'<br />';
 			return false;
-		}	
-		
+		}
+
 		return true;
 	}
-	
+
 }

@@ -11,6 +11,7 @@ defined('_JEXEC') or die('Restricted access');
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Helper\ContentHelper;
+use Joomla\CMS\Table\Table;
 
 // addon
 if (!defined('JIFILE_ADDON_PATH')) {
@@ -1026,7 +1027,7 @@ class jifilehelper {
 	 */
 	static function saveParams($addparams) {
 
-		$table =& JTable::getInstance('extension');
+		$table =& Table::getInstance('extension');
 		$params = & JComponentHelper::getParams('com_jifile');
 		$params->loadArray($addparams);
 
@@ -1238,7 +1239,7 @@ class jifilehelper {
 		$filter['plugin'] = array('type' => 's', 'value' => 'lucene');
 		$order = array();
 		$order['ordering'] = 'asc';
-		$tableAddon = JTable::getInstance('Addon', 'JifileTable');
+		$tableAddon = Table::getInstance('Addon', 'JifileTable');
 		$plugins = $tableAddon->getAddon($filter, $order);
 		$jifilefactory = JiFilePluginFactory::getInstance();
 
@@ -1267,8 +1268,8 @@ class jifilehelper {
 		// get all addon not core
 		$filter['core'] = array('type' => 'i', 'value' => '0');
 
-		JTable::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_jifile/tables/');
-		$tableAddon = JTable::getInstance('Addon', 'JifileTable');
+		Table::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_jifile/tables/');
+		$tableAddon = Table::getInstance('Addon', 'JifileTable');
 		$addons = $tableAddon->getAddon($filter);
 
 		if (!empty($addons)) {

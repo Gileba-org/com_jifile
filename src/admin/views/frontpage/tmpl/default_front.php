@@ -17,7 +17,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 	foreach ($addons as $addon) {
 		foreach ($addon as $values) {
 			// define access (ACL)
-			if (empty($values['rules']) || $this->canDo->get('rules')) {
+			if (empty($values['rules']) || $this->canDo->get($values['rules'])) {
 				list($context, $id) = explode(".", $values['addon']);
 				// after tree box left, create un clear
 					echo "\n<div class=\"icon span1\">";

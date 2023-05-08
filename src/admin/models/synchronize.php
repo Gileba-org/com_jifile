@@ -8,23 +8,25 @@
 */
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+use Joomla\CMS\Table\Table;
+
 jimport( 'joomla.application.component.model' );
 require_once(JPATH_SITE.'/administrator/components/com_jifile/models/lucene.php');
 
 
 class JifileModelSynchronize extends JifileModelLucene {
-	
-	function __construct() {		
+
+	function __construct() {
 		parent::__construct();
 	}
-	
+
 	/**
-	 * Synchronize table with index 
+	 * Synchronize table with index
 	 * @return bool
 	 */
 	public function synchronize() {
 		// get instance of Documents Table
-		$table = JTable::getInstance("Documents", "JifileTable");
+		$table = Table::getInstance("Documents", "JifileTable");
 		// get Lucene instance
 		$lucene = $this->getIndex();
 		set_time_limit(0);
@@ -42,9 +44,9 @@ class JifileModelSynchronize extends JifileModelLucene {
 					$delete = $lucene->isDeleted($i) ? 1 : 0;
 					$table->insertDocuments($keyid, $delete);
 				}
-			}	
+			}
 		}
-		
-		return true;		
-	}	
+
+		return true;
+	}
 }

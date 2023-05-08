@@ -1,7 +1,7 @@
 <?php
 /**
  * IFile framework
- * 
+ *
  * @category   IndexingFile
  * @package    ifile
  * @subpackage helpers
@@ -22,45 +22,45 @@
  * @license    GNU LESSER GENERAL PUBLIC LICENSE Version 2.1, February 1999
  */
 class IFileHelper {
-	
+
 	/**
 	 * Setta il il tipo del field e il tipo di encoding dalla configurazione.
-	 * 
+	 *
 	 * Type:
-	 * 
-	 * Keyword 
-	 * UnIndexed 
-	 * Binary 
-	 * Text 
-	 * UnStored 
-	 * 
+	 *
+	 * Keyword
+	 * UnIndexed
+	 * Binary
+	 * Text
+	 * UnStored
+	 *
 	 *  Field Type 	Stored 	Indexed 	Tokenized 	Binary
 	 *	Keyword 	Yes 	Yes 		No 			No
 	 *	UnIndexed 	Yes 	No 			No 			No
 	 *	Binary 		Yes 	No 			No 			Yes
 	 *	Text 		Yes 	Yes 		Yes 		No
 	 *	UnStored 	No 		Yes 		Yes 		No
-	 *  
+	 *
 	 * @param Zend_Search_Lucene_Document $doc
 	 * @param string $fieldsName
 	 * @param mixed $value
 	 * @return void
 	 */
 	static function setFieldType(Zend_Search_Lucene_Document $doc, $fieldName, $fieldValue) {
-		
-		// recupero dati di configurazione 	
+
+		// recupero dati di configurazione
 		$iFileConfig = IFileConfig::getInstance();
-		// recupero dei parametrio di configurazione del Field		
+		// recupero dei parametrio di configurazione del Field
 		$field = $iFileConfig->getDocumentField($fieldName);
-		
+
 		if (!$field) {
 			require_once 'IFile_Exception.php';
 			throw new IFile_Exception('Field not exist');
 		}
-		
+
 		// Verifico che l'encoding sia settato oppure non vuoto
 		$encoding = (!isset($field['encoding']) || empty($field['encoding'])) ? $iFileConfig->getConfig('encoding') : $field['encoding'];
-		
+
 		switch ($field['type']) {
 			case 'Keyword':
 				$doc->addField(Zend_Search_Lucene_Field::Keyword($fieldName, $fieldValue, $encoding));
@@ -83,21 +83,21 @@ class IFileHelper {
 				break;
 		}
 	}
-	
+
 	/**
 	 * Ritorna il nome di un file, dato il percorso
 	 *
-	 * @param string $file 
+	 * @param string $file
 	 * @return string
 	 */
 	static function getName($file) {
 		$slash = strrpos($file, DIRECTORY_SEPARATOR) + 1;
 		return substr($file, $slash);
 	}
-	
+
 	/**
 	 * Ritorna l'estensione di un file
-	 * 
+	 *
 	 * @param string $file
 	 * @return string
 	 */
@@ -105,36 +105,36 @@ class IFileHelper {
 		$dot = strrpos($file, '.') + 1;
 		return substr($file, $dot);
 	}
-	
+
 	/**
 	 * Elimina l'ultimo "directory separetor" dal percorso di un file
-	 * 
+	 *
 	 * @param string $path
 	 * @return string
 	 */
 	static function deleteLastSlash($path) {
-		$path = realpath($path);		
-		
-		if($path{strlen($path)-1} == DIRECTORY_SEPARATOR) {
-			return substr($path,0,-1);			
+		$path = realpath($path);
+
+		if($path[strlen($path)-1] == DIRECTORY_SEPARATOR) {
+			return substr($path,0,-1);
 		}
-		
+
 		return $path;
 	}
-	
+
 	/**
 	 * Ritorna il checksum in MD5 del contenuto di un file
-	 * 
+	 *
 	 * @param string $file
 	 * @return string
 	 */
 	static function checksumFromFile($file) {
 		return md5_file($file);
-	} 
-	
+	}
+
 	/**
 	 * Ritorna una stringa formattata senza l'ultima parola tagliata
-	 * 
+	 *
 	 * @param string $text
 	 * @return string
 	 */
@@ -143,21 +143,21 @@ class IFileHelper {
 
 		$arrayText =  preg_split("/[\s]+/", $text);
 		$countWord = count($arrayText)-1;
-		
+
 		unset($arrayText[$countWord]);
-		
-		$introText = implode(" ", $arrayText);	
-		
+
+		$introText = implode(" ", $arrayText);
+
 		return $introText;
 	}
-	
+
 	/**
 	 * Ritorna una stringa nel formato INI dato un oggetto
-	 * 
+	 *
 	 * Non permette di avere valori innestati superiori a due livelli di un oggetto
 	 *
 	 * @param object $object
-	 * @return string 
+	 * @return string
 	 */
 	static function objectToString(&$object)
 	{
@@ -209,10 +209,10 @@ class IFileHelper {
 		return $prepend."\n".$retval;
 	}
 
-	
+
 	/**
 	 * Parserizza una stringa dal formato INI in un oggetto
-	 * 
+	 *
 	 * Il parser e' basato su phpDocumentor phpDocumentor_parse_ini_file function
 	 *
 	 * @param mixed $data una stringa INI o un array di linee
@@ -257,7 +257,7 @@ class IFileHelper {
 		foreach ($lines as $line)
 		{
 			// ignore comments
-			if ($line && $line{0} == ';') {
+			if ($line && $line[0] == ';') {
 				continue;
 			}
 
@@ -268,7 +268,7 @@ class IFileHelper {
 			}
 
 			$lineLen = strlen($line);
-			if ($line && $line{0} == '[' && $line{$lineLen-1} == ']')
+			if ($line && $line[0] == '[' && $line[$lineLen-1] == ']')
 			{
 				$sec_name = substr($line, 1, $lineLen - 2);
 				if ($process_sections) {
@@ -282,10 +282,10 @@ class IFileHelper {
 					$property = trim(substr($line, 0, $pos));
 
 					// property is assumed to be ascii
-					if ($property && $property{0} == '"')
+					if ($property && $property[0] == '"')
 					{
 						$propLen = strlen( $property );
-						if ($property{$propLen-1} == '"') {
+						if ($property[$propLen-1] == '"') {
 							$property = stripcslashes(substr($property, 1, $propLen - 2));
 						}
 					}
@@ -313,10 +313,10 @@ class IFileHelper {
 								else if ($value == 'true') {
 									$value = true;
 								}
-								else if ($value && $value{0} == '"')
+								else if ($value && $value[0] == '"')
 								{
 									$valueLen = strlen( $value );
-									if ($value{$valueLen-1} == '"') {
+									if ($value[$valueLen-1] == '"') {
 										$value = stripcslashes(substr($value, 1, $valueLen - 2));
 									}
 								}
@@ -353,10 +353,10 @@ class IFileHelper {
 						else if ($value == 'true') {
 							$value = true;
 						}
-						else if ($value && $value{0} == '"')
+						else if ($value && $value[0] == '"')
 						{
 							$valueLen = strlen( $value );
-							if ($value{$valueLen-1} == '"') {
+							if ($value[$valueLen-1] == '"') {
 								$value = stripcslashes(substr($value, 1, $valueLen - 2));
 							}
 						}
@@ -378,7 +378,7 @@ class IFileHelper {
 				}
 				else
 				{
-					if ($line && $line{0} == ';') {
+					if ($line && $line[0] == ';') {
 						continue;
 					}
 					if ($process_sections)

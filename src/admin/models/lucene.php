@@ -8,6 +8,8 @@
 */
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+use Joomla\CMS\Table\Table;
+
 jimport( 'joomla.application.component.model' );
 require_once(JPATH_SITE.'/administrator/components/com_jifile/helpers/jifilehelper.php');
 require_once JPATH_IFILE_LIBRARY.'/ifile/IFileFactory.php';
@@ -19,14 +21,14 @@ if(file_exists(JPATH_IFILE_LIBRARY.'/ifile/Zend')) {
 }
 
 class JifileModelLucene extends JModelLegacy {
-	
+
 	var $_data;
 	private $index_path = null;
 	private $lucene = null;
 	private $tableDocuments = null;
-	
+
 	function __construct() {
-		
+
 		$this->index_path = jifilehelper::getIndexPath();
 
 		if(!empty($this->index_path)) {
@@ -47,18 +49,18 @@ class JifileModelLucene extends JModelLegacy {
 
 		parent::__construct();
 	}
-	
+
 	public function getIndex_path() {
 		return $this->index_path;
 	}
-	
+
 	public function getIndex() {
 		return $this->lucene;
 	}
-	
+
 	/**
 	 * Return the document from KEY field
-	 * 
+	 *
 	 * @param string $key
 	 * @return Zend_Search_Document
 	 */
@@ -66,30 +68,30 @@ class JifileModelLucene extends JModelLegacy {
 		$query = new IFileQueryRegistry();
 		$query->setQuery($key, "key", IFileQuery::MATCH_REQUIRED);
 		$hits = $this->getIndex()->query($query);
-		
-		return $hits;		
+
+		return $hits;
 	}
-	
+
 	private function _buildQuery($search, $field, $searchphrase) {
 		$field 	  = ($field == '') ? null : $field;
 		$query 	  = new IFileQueryRegistry();
 		$jCharset = JFactory::getDocument()->getCharset();
-		
+
 		//controllo analyzer, se il nome contiene "caseinsensitive" faccio strtolower
 		$iFileConfig = IFileConfig::getInstance();
 		$analyzer = $iFileConfig->getConfig('analyzer');
 		if(stripos($analyzer, 'caseinsensitive')) {
 			$search = JString::strtolower($search);
 		}
-		
+
 		if($searchphrase == 'exact') {
 			$query->setQuery($search, $field, null, null, $jCharset);
 			return $query;
 		}
-		
-		// trasforma il termine in token 
+
+		// trasforma il termine in token
 		$tokens = Zend_Search_Lucene_Analysis_Analyzer::getDefault()->tokenize($search, $jCharset);
-		
+
 		foreach ($tokens as $parola) {
 			switch($searchphrase) {
 				case 'all':
@@ -98,7 +100,7 @@ class JifileModelLucene extends JModelLegacy {
 				case 'any':
 					$query->setQuery($parola->getTermText(), $field, IFileQuery::MATCH_OPTIONAL, null, $jCharset);
 				break;
-				case 'wildcard':					
+				case 'wildcard':
 					$query->setQuery('*'.$parola->getTermText()."*", $field, IFileQuery::MATCH_OPTIONAL, null, $jCharset);
 					return $query;
 				break;
@@ -106,15 +108,15 @@ class JifileModelLucene extends JModelLegacy {
 		}
 		return $query;
 	}
-	
+
 	public function search($search, $field = null, $searchphrase = 'any', $order = null, $order_dir = null, $limit = false) {
 		$hits = array();
 		if(empty($search)) {
 			return $hits;
 		}
 		$lucene = $this->getIndex();
-		$query = $this->_buildQuery($search, $field, $searchphrase);	
-		
+		$query = $this->_buildQuery($search, $field, $searchphrase);
+
 		if($query) {
 			if($limit > 0) {
 				$lucene->setResultLimit($limit);
@@ -123,7 +125,7 @@ class JifileModelLucene extends JModelLegacy {
 				$order_dir = ($order_dir == 'asc') ? SORT_ASC : SORT_DESC;
 				$lucene->setSort($order, SORT_REGULAR, $order_dir);
 			}
-			
+
 			switch ($searchphrase) {
 				case 'exact':
 					$hits = $lucene->queryPhrase($query);
@@ -140,25 +142,25 @@ class JifileModelLucene extends JModelLegacy {
 		}
 		return $hits;
 	}
-	
+
 	public function getIdByFile($source) {
 
 		$key = md5_file($source);
 		$result = $this->search($key, 'key');
-		if($result && count($result) == 1){ 
+		if($result && count($result) == 1){
 			$result = array($result[0]->id);
 		} else {
 			$result = array(false);
 		}
-		
+
 		return $result[0];
 	}
-	
+
 	public function index($source, $addField = array()) {
-		
+
 		$lucene = $this->getIndex();
 		$lucene->setIndexFile($source);
-		
+
 		try {
 			$this->setMoreInfo($addField);
 			$doc = $lucene->addDocument();
@@ -173,28 +175,28 @@ class JifileModelLucene extends JModelLegacy {
 			$this->setError(jifilehelper::JText($e->getMessage()));
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	public function indexManual($fields) {
 		// decode filename
 		$filename = urldecode($fields['filename']);
-		
+
 		if(empty($fields['body'])){
 			$this->setError(JText::_('Body').': '.JText::_('REQUIRED_FIELD'));
 			return false;
 		}
-		
+
 		require_once JPATH_IFILE_LIBRARY.'/ifile/adapter/beans/LuceneDataIndexBean.php';
-		
+
 		$addField = $fields['add'];
-		
+
 		$lucene = $this->getIndex();
-		
+
 		try {
 			$bean = new LuceneDataIndexBean();
-			
+
 			$bean->setBody($fields['body']);
 			$bean->setCreated($fields['created']);
 			$bean->setCreator($fields['creator']);
@@ -203,9 +205,9 @@ class JifileModelLucene extends JModelLegacy {
 			$bean->setSubject($fields['subject']);
 			$bean->setDescription($fields['description']);
 			$bean->setTitle($fields['title']);
-			
+
 			$doc = $bean->getLuceneDocument();
-			
+
 			$IfileConfig = IFileConfig::getInstance();
 			// Latitudine Decimal
 			if (trim($fields['GPSLatitudeGoogleDecimal']) != '') {
@@ -214,13 +216,13 @@ class JifileModelLucene extends JModelLegacy {
 			}
 			// Longitudine Decimal
 			if (trim($fields['GPSLongitudeGoogleDecimal']) != '') {
-				// longitudine nel formato googlemap DMS 
+				// longitudine nel formato googlemap DMS
 				$doc->addField(Zend_Search_Lucene_Field::Keyword('GPSLongitudeGoogleDecimal', $fields['GPSLongitudeGoogleDecimal'], $IfileConfig->getConfig('encoding')));
 			}
-			
+
 			$lucene->setIndexFile($filename);
 			$this->setMoreInfo($addField);
-		
+
 			$resDoc = $lucene->addDocument($doc);
 			$lucene->commit();
 			//jifilehelper::deleteFileCache($fields['filename']);
@@ -234,19 +236,19 @@ class JifileModelLucene extends JModelLegacy {
 			$this->setError(jifilehelper::JText($e->getMessage()));
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Insert Key Document in DB
-	 * @return 
+	 * @return
 	 */
 	public function insertDocuments($keyid) {
 		// save file information in #__jifiledocuments
 		// get instance of #__jifiledocuments Table
 		if (empty($this->tableDocuments)) {
-			$this->tableDocuments = JTable::getInstance("Documents", "JifileTable");
+			$this->tableDocuments = Table::getInstance("Documents", "JifileTable");
 		}
 		// check if empty
 		if (!empty($keyid)) {
@@ -254,16 +256,16 @@ class JifileModelLucene extends JModelLegacy {
 			$this->tableDocuments->insertDocuments($keyid);
 		}
 	}
-	
+
 	/**
 	 * Update field "Delete" of one documents in DB
-	 * @return 
+	 * @return
 	 */
 	public function deleteDocuments($keyid) {
 		// delete file information in #__jifiledocuments
 		// get instance of #__jifiledocuments Table
 		if (empty($this->tableDocuments)) {
-			$this->tableDocuments = JTable::getInstance("Documents", "JifileTable");
+			$this->tableDocuments = Table::getInstance("Documents", "JifileTable");
 		}
 		// check if empty
 		if (!empty($keyid)) {
@@ -271,54 +273,54 @@ class JifileModelLucene extends JModelLegacy {
 			$this->tableDocuments->updateDeleteDocuments($keyid);
 		}
 	}
-	
+
 	/**
 	 * Update field "Delete" of all documents in DB
-	 * @return 
+	 * @return
 	 */
 	public function deleteAllDocuments() {
 		// delete file information in #__jifiledocuments
 		// get instance of #__jifiledocuments Table
 		if (empty($this->tableDocuments)) {
-			$this->tableDocuments = JTable::getInstance("Documents", "JifileTable");
+			$this->tableDocuments = Table::getInstance("Documents", "JifileTable");
 		}
 		// add documents in DB
 		$this->tableDocuments->truncateDocuments();
 	}
-	
+
 	/**
 	 * Delete All Documents in DB
-	 * @return 
+	 * @return
 	 */
 	public function optimazeDocuments() {
 		// delete file information in #__jifiledocuments
 		// get instance of #__jifiledocuments Table
 		if (empty($this->tableDocuments)) {
-			$this->tableDocuments = JTable::getInstance("Documents", "JifileTable");
+			$this->tableDocuments = Table::getInstance("Documents", "JifileTable");
 		}
 		// add documents in DB
 		$this->tableDocuments->deleteAllDocuments();
 	}
-	
+
 	/**
 	 * Indexing Images Fields
 	 * @param array $fields
-	 * @return 
+	 * @return
 	 */
 	public function indexManualImages($fields) {
-		
+
 		// decode filename
 		$filename = urldecode($fields['filename']);
-				
+
 		if(empty($fields['body'])){
 			$this->setError(JText::_('Body').': '.JText::_('REQUIRED_FIELD'));
 			return false;
 		}
-		
+
 		require_once JPATH_IFILE_LIBRARY.'/ifile/adapter/beans/LuceneDataIndexBean.php';
 		$addField = $fields['add'];
 		$lucene = $this->getIndex();
-		
+
 		try {
 			$bean = new LuceneDataIndexBean();
 			$bean->setBody($fields['body']);
@@ -329,9 +331,9 @@ class JifileModelLucene extends JModelLegacy {
 			$bean->setSubject($fields['subject']);
 			$bean->setDescription($fields['ImageDescription']);
 			$bean->setTitle($fields['title']);
-			
+
 			$doc = $bean->getLuceneDocument();
-			
+
 			$IfileConfig = IFileConfig::getInstance();
 			// Inserisce i dati del file all'interno dell'indice come Field
 			// Dimensione del file in byte
@@ -402,12 +404,12 @@ class JifileModelLucene extends JModelLegacy {
 			}
 			// Longitudine DMS
 			if (trim($fields['GPSLongitudeGoogle']) != '') {
-				// longitudine nel formato googlemap DMS 
+				// longitudine nel formato googlemap DMS
 				$doc->addField(Zend_Search_Lucene_Field::Keyword('GPSLongitudeGoogle', $fields['GPSLongitudeGoogle'], $IfileConfig->getConfig('encoding')));
 			}
 			// Longitudine Decimal
 			if (trim($fields['GPSLongitudeGoogleDecimal']) != '') {
-				// longitudine nel formato googlemap DMS 
+				// longitudine nel formato googlemap DMS
 				$doc->addField(Zend_Search_Lucene_Field::Keyword('GPSLongitudeGoogleDecimal', $fields['GPSLongitudeGoogleDecimal'], $IfileConfig->getConfig('encoding')));
 			}
 			// XResolution
@@ -417,7 +419,7 @@ class JifileModelLucene extends JModelLegacy {
 			// YResolution
 			if (trim($fields['YResolution']) != '') {
 				$doc->addField(Zend_Search_Lucene_Field::Keyword('YResolution', $fields['YResolution'], $IfileConfig->getConfig('encoding')));
-			}		
+			}
 			// Data creazione
 			if (trim($fields['DateTime']) != '') {
 				$doc->addField(Zend_Search_Lucene_Field::Keyword('DateTime', $fields['DateTime'], $IfileConfig->getConfig('encoding')));
@@ -438,11 +440,11 @@ class JifileModelLucene extends JModelLegacy {
 			if (trim($fields['LightSource']) != '') {
 				$doc->addField(Zend_Search_Lucene_Field::Keyword('LightSource', $fields['LightSource'], $IfileConfig->getConfig('encoding')));
 			}
-			
+
 			//$lucene->setIndexFile($fields['filename']);
 			$lucene->setIndexFile($filename);
 			$this->setMoreInfo($addField);
-		
+
 			$resDoc = $lucene->addDocument($doc);
 			$lucene->commit();
 			//jifilehelper::deleteFileCache($fields['filename']);
@@ -456,29 +458,29 @@ class JifileModelLucene extends JModelLegacy {
 			$this->setError(jifilehelper::JText($e->getMessage()));
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Indexing Multimedia Fields
 	 * @param array $fields
-	 * @return 
+	 * @return
 	 */
 	public function indexManualMultimedia($fields) {
-		
+
 		// decode filename
 		$filename = urldecode($fields['filename']);
-		
+
 		if(empty($fields['body'])){
 			$this->setError(JText::_('Body').': '.JText::_('REQUIRED_FIELD'));
 			return false;
 		}
-		
+
 		require_once JPATH_IFILE_LIBRARY.'/ifile/adapter/beans/LuceneDataIndexBean.php';
 		$addField = $fields['add'];
 		$lucene = $this->getIndex();
-		
+
 		try {
 			$bean = new LuceneDataIndexBean();
 			$bean->setBody($fields['body']);
@@ -489,9 +491,9 @@ class JifileModelLucene extends JModelLegacy {
 			$bean->setSubject($fields['subject']);
 			$bean->setDescription($fields['description']);
 			$bean->setTitle($fields['title']);
-			
+
 			$doc = $bean->getLuceneDocument();
-			
+
 			$IfileConfig = IFileConfig::getInstance();
 			// Inserisce i dati del file all'interno dell'indice come Field
 			// Codificato da
@@ -553,14 +555,14 @@ class JifileModelLucene extends JModelLegacy {
 			}
 			// Longitudine Decimal
 			if (trim($fields['GPSLongitudeGoogleDecimal']) != '') {
-				// longitudine nel formato googlemap DMS 
+				// longitudine nel formato googlemap DMS
 				$doc->addField(Zend_Search_Lucene_Field::Keyword('GPSLongitudeGoogleDecimal', $fields['GPSLongitudeGoogleDecimal'], $IfileConfig->getConfig('encoding')));
 			}
-						
+
 			//$lucene->setIndexFile($fields['filename']);
 			$lucene->setIndexFile($filename);
 			$this->setMoreInfo($addField);
-		
+
 			$resDoc = $lucene->addDocument($doc);
 			$lucene->commit();
 			//jifilehelper::deleteFileCache($fields['filename']);
@@ -574,10 +576,10 @@ class JifileModelLucene extends JModelLegacy {
 			$this->setError(jifilehelper::JText($e->getMessage()));
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	public function delete($id, $isUpdate = false) {
 		if($id !== false) {
 			$lucene = $this->getIndex();
@@ -606,7 +608,7 @@ class JifileModelLucene extends JModelLegacy {
 			// delete logic documents in DB
 			$this->deleteAllDocuments();
 	}
-	
+
 	public function optimize() {
 		$lucene = $this->getIndex();
 		set_time_limit(0);
@@ -618,25 +620,25 @@ class JifileModelLucene extends JModelLegacy {
 
 	public function getLuceneDoc($filename, $toArray = false, $clear = false) {
 		jimport('joomla.filesystem.file');
-		
+
 		try {
 			$factory = IFileFactory::getInstance();
-			
+
 			$adapter = $factory->getAdapterSearchLuceneDocument(JFile::getExt($filename));
-	
+
 			if ($adapter === false) {
 				return false;
 			}
-			
+
 			// chiamata al metodo per il parser del file
 			$adapter->setFilename($filename);
-		
+
 			$doc = $adapter->loadParserFile();
 		} catch (Exception $e) {
 			$this->setError($e->getMessage());
 			return false;
 		}
-		
+
 		try {
 			if($toArray) {
 				return jifilehelper::luceneDocToArray($doc, $clear);
@@ -651,7 +653,7 @@ class JifileModelLucene extends JModelLegacy {
 	/**
 	 * Set type of indexing
 	 * @param object $addField [optional]
-	 * @return 
+	 * @return
 	 */
 	private function setMoreInfo($addField = array()) {
 		if(!is_array($addField)) {
@@ -659,13 +661,13 @@ class JifileModelLucene extends JModelLegacy {
 		}
 		$lucene = $this->getIndex();
 		foreach ($addField as $name => $value) {
-			
+
 			// define type for custom field created on Manually Index
-			$type = '';				
+			$type = '';
 			if (strpos($name, '|@@|') !== false) {
-				list($name, $type) = explode("|@@|", $name);	
+				list($name, $type) = explode("|@@|", $name);
 			}
-			
+
 			if (!is_array($value)) {
 				$field['value'] = $value;
 				$field['type'] = (empty($type)) ? "Text" : $type;
@@ -673,13 +675,13 @@ class JifileModelLucene extends JModelLegacy {
 				$field['value'] = $value['value'];
 				$field['type'] = (empty($value['type'])) ? 'Text' : $value['type'];
 			}
-			
+
 			if ($name == 'class') {
 				$field['type'] = 'UnIndexed';
 			}
-			
+
 			unset($value);
-			
+
 			$lucene->addCustomField($name, $field['value'], $field['type']);
 		}
 		return true;

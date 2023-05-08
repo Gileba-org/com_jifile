@@ -7,6 +7,9 @@
 * @link		http://jifile.isapp.it
 */
 defined('_JEXEC') or die();
+
+use Joomla\CMS\Table\Table;
+
 jimport( 'joomla.application.component.view' );
 require_once(JPATH_COMPONENT_ADMINISTRATOR.'/helpers/jifilehelper.php');
 
@@ -20,8 +23,7 @@ class JifileViewFrontpage extends JViewLegacy {
 		$filter['type'] = array('type' => 'i', 'value' => 2, 'operation' => '!=');
 		$order = array();
 		$order['ordering'] = 'asc';
-//		JTable::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_jifile/tables/');
-		$tableAddon = JTable::getInstance('Addon', 'JifileTable');
+		$tableAddon = Table::getInstance('Addon', 'JifileTable');
 		$addon = $tableAddon->getAddon($filter, $order);
 
 		$this->setToolbar();
